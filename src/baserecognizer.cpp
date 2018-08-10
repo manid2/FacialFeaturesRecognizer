@@ -22,7 +22,13 @@ BaseRecognizer::~BaseRecognizer() {
   // TODO: YTI
 }
 
+void BaseRecognizer::printLog() {
+  DEBUGLE(" hello world\n");
+}
+
 int execute(int argc, char **argv) {
+  BaseRecognizer br;
+  br.printLog();
   // TODO: YTI
   return 0;
 }

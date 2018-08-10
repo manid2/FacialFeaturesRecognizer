@@ -17,6 +17,8 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
+#include <logger.h>
+
 namespace FFR {
 
 /**
@@ -26,6 +28,9 @@ class BaseRecognizer {
  public:
   BaseRecognizer(void);
   virtual ~BaseRecognizer();
+
+  // simple test for logger
+  void printLog(void);
 
  public:
   // TODO: YTI, member functions and variables
