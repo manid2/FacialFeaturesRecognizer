@@ -24,16 +24,20 @@
 namespace FFR {
 
 // define default log prefixes
+#ifndef WITH_TIME_STAMP
+#  define WITH_TIME_STAMP
+#endif
+
 #ifndef WITH_FILE_NAME
 #  define WITH_FILE_NAME
 #endif
 
-#ifndef WITH_FUNC_NAME
-#  define WITH_FUNC_NAME
+#ifndef WITH_CLASS_NAME
+#  define WITH_CLASS_NAME
 #endif
 
-#ifndef WITH_TIME_STAMP
-#  define WITH_TIME_STAMP
+#ifndef WITH_FUNC_NAME
+#  define WITH_FUNC_NAME
 #endif
 
 typedef std::string String;

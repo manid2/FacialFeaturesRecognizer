@@ -16,9 +16,9 @@
 #include <ffr_precomp.h>
 #include <logger.h>
 
-#include "opencv2/core/core.hpp"
-#include "opencv2/contrib/contrib.hpp"
+#include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 
 namespace FFR {
 
@@ -29,6 +29,7 @@ namespace FFR {
  */
 class BaseRecognizer {
  public:
+  const FFR::String _className;
   BaseRecognizer(void);
   virtual ~BaseRecognizer();
 
@@ -36,7 +37,14 @@ class BaseRecognizer {
   void printLog(void);
 
  public:
-  ErrorCode detectFace(const std::string& vidFileName = "test.m4v");
+  ErrorCode readVideoFromFile(const std::string& vidFileName = "test.m4v");
+  ErrorCode readVideoFromCam(const int id = 0);
+  ErrorCode detectFace(cv::Mat& frame, std::vector<cv::Rect>& faces,
+                       cv::Mat& frame_gray);
+
+ private:
+  cv::CascadeClassifier m_faceCascade;
+  ErrorCode readVideo(cv::VideoCapture& cap);
 };
 
 extern int execute(int argc, char **argv);

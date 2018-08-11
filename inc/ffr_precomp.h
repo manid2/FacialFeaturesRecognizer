@@ -22,7 +22,8 @@ enum ErrorCode {
   FileOpenError,
   FileWriteError,
   ImageReadError,
-  ImageWriteError
+  ImageWriteError,
+  FaceDetectError
 };
 
 }  // namesapce FFR

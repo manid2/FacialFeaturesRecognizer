@@ -16,7 +16,8 @@ using namespace cv;
 
 namespace FFR {
 
-BaseRecognizer::BaseRecognizer() {
+BaseRecognizer::BaseRecognizer()
+    : _className(FUNC_NAME) {
   // TODO: YTI
 }
 
@@ -28,16 +29,57 @@ void BaseRecognizer::printLog() {
   DEBUGLE(" hello world\n");
 }
 
-ErrorCode BaseRecognizer::detectFace(const std::string& vidFileName) {
+ErrorCode BaseRecognizer::readVideoFromFile(const std::string& vidFileName) {
   ErrorCode err = FFR::OK;
 
   do {  // for common error handling
-
     VideoCapture cap(vidFileName);
     // Check if camera opened successfully
     if (!cap.isOpened()) {
       err = FFR::ImageReadError;
       DEBUGLE("Error opening video stream or file\n");
+      break;
+    }
+
+    err = this->readVideo(cap);
+
+    cap.release();
+    destroyAllWindows();
+  } while (0);
+
+  return err;
+}
+
+ErrorCode BaseRecognizer::readVideoFromCam(const int id) {
+  ErrorCode err = FFR::OK;
+
+  do {  // for common error handling
+    VideoCapture cap(id);
+    // Check if camera opened successfully
+    if (!cap.isOpened()) {
+      err = FFR::ImageReadError;
+      DEBUGLE("Error opening video stream or file\n");
+      break;
+    }
+
+    err = this->readVideo(cap);
+
+    cap.release();
+    destroyAllWindows();
+  } while (0);
+
+  return err;
+}
+
+ErrorCode BaseRecognizer::readVideo(cv::VideoCapture& cap) {
+  ErrorCode err = FFR::OK;
+
+  do {  // for common error handling
+    /// Load cascade classifier
+    m_faceCascade.load("haarcascade_frontalface_default.xml");
+    if (m_faceCascade.empty()) {
+      err = FFR::ImageReadError;
+      DEBUGLE("Error reading Cascade Classifier\n");
       break;
     }
 
@@ -50,20 +92,49 @@ ErrorCode BaseRecognizer::detectFace(const std::string& vidFileName) {
         break;
       }
 
-      // Display the resulting frame
+      /// Detect faces in the frame
+      cv::Mat frame_gray;
+      std::vector<Rect> faces;
+      err = this->detectFace(frame, faces, frame_gray);
+
+      /// pre-process faces to get HOG fv
+      /// 1. crop the face
+
+      /// Display the resulting frame
       imshow("video", frame);
 
-      // Press  ESC or 'q' on keyboard to exit
-      char c = (char) waitKey(25);
+      /// Press  ESC or 'q' on keyboard to exit
+      char c = (char) waitKey(10);
       if (c == 27 || c == 'q') {
         err = FFR::OK;
         DEBUGLD("Pressed=[0x%x], reading video stream or file exit\n", (int )c);
         break;
       }
     }  // while(1)
+  } while (0);
 
-    cap.release();
-    destroyAllWindows();
+  return err;
+}
+
+ErrorCode BaseRecognizer::detectFace(cv::Mat& frame, std::vector<Rect>& faces,
+                                     cv::Mat& frame_gray) {
+  ErrorCode err = FFR::OK;
+
+  do {  // for common error handling
+    /// Pre-process input frame for face detection
+    cvtColor(frame, frame_gray, CV_BGR2GRAY);
+    equalizeHist(frame_gray, frame_gray);
+
+    /// Detect faces
+    m_faceCascade.detectMultiScale(frame_gray, faces, 1.1, 3,
+                                   0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
+
+    for (size_t i = 0; i < faces.size(); i++) {
+      Point center(faces[i].x + faces[i].width * 0.5,
+                   faces[i].y + faces[i].height * 0.5);
+      ellipse(frame, center, Size(faces[i].width * 0.5, faces[i].height * 0.5),
+              0, 0, 360, Scalar(255, 0, 0), 4, 8, 0);
+    }
   } while (0);
 
   return err;
@@ -72,8 +143,8 @@ ErrorCode BaseRecognizer::detectFace(const std::string& vidFileName) {
 int execute(int argc, char **argv) {
   ErrorCode err = FFR::OK;
   BaseRecognizer br;
-  /// Detect face
-  err = br.detectFace();
+  /// Detect face on the video stream
+  err = br.readVideoFromFile();
 
   return static_cast<int>(err);
 }
