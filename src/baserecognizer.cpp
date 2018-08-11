@@ -108,7 +108,7 @@ ErrorCode BaseRecognizer::readVideo(cv::VideoCapture& cap) {
       err = this->detectFace(frame, faces, frame_gray);
 
       /// Recognize facial features
-      std::vector<ResultsSet> results;
+      std::vector<ResultsSet> results(faces.size());
       this->recognizeFeatures(m_features, results, frame_gray, faces);
 
       /// Draw the results on the original frame
@@ -170,13 +170,12 @@ ErrorCode BaseRecognizer::recognizeFeatures(const FeaturesSet& features,
         /// 3. get HOG fv
 
         /// 4. make predictions for each feature
-#if 0 // FIXME: fix out of range exception
-        for (auto f : features) {
+        FeaturesSet::iterator itr_f = features.begin();
+        for (; itr_f != features.end(); itr_f++) {
           FFRecognizer ffr;
-          ffr.fr = FFR::getRecognizer(f);
+          ffr.fr = FFR::getRecognizer(*itr_f);
           results.at(fa).insert(ffr.fr->getResult());
         }
-#endif
       } catch (const cv::Exception& e) {
         // ignore any error after printing its message
         stringstream ss;
@@ -210,16 +209,14 @@ ErrorCode BaseRecognizer::drawResults(cv::Mat& frame,
               Size(face_rect.width * 0.5, face_rect.height * 0.5), 0, 0, 360,
               Scalar(255, 0, 0), 4, 8, 0);
       /// 2. Draw features results text near the faces
-#if 0 // FIXME: fix out of range exception
       FeaturesSet::iterator itr_f = features.begin();
       ResultsSet::iterator itr_r = results.at(fa).begin();
-      for (; itr_f != features.end(); itr_f++, itr_r++) {
+      for (int li = 0; itr_f != features.end(); itr_f++, itr_r++, li += 22) {
         const FFR::Feature& f = *itr_f;
         putText(frame, format("%s: %s", enum2str(f).c_str(), itr_r->c_str()),
-                Point(face_rect.x, face_rect.y), m_fontFace, m_fontScale,
+                Point(face_rect.x, face_rect.y + li), m_fontFace, m_fontScale,
                 m_fontColor, 2);
       }
-#endif
     }
   } while (0);
 
