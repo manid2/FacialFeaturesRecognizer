@@ -10,7 +10,6 @@
 #--------------
 # This project is used to recognize features in face
 # such as Age, Gender and Emotions.
-# Based on OpenCV tutorial by Philipp Wagner <bytefish[at]gmx[dot]de>
 #=============================================================================
 
 #=============================================================================

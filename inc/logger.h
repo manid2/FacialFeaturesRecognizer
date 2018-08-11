@@ -10,8 +10,8 @@
  * Description :  Header only logger utility for the project.
  \***************************************************************************/
 
-#ifndef FFR_UTIL_LOGGER_H_
-#define FFR_UTIL_LOGGER_H_
+#ifndef FFR_INC_LOGGER_H_
+#define FFR_INC_LOGGER_H_
 
 #include <time.h>
 #include <stdio.h>
@@ -87,17 +87,17 @@ static String getLogDateTime(void) {
 #define DEBUGLE(FORMAT, ...) \
         fprintf(stderr, \
                 "%s, %s:%5d: %s::%s() ERR: " FORMAT ,\
-                TIME_STAMP, __FILENAME__, __LINE__, CLASS_NAME, FUNC_NAME, ##__VA_ARGS__);
+                TIME_STAMP, __FILENAME__, __LINE__, CLASS_NAME, FUNC_NAME, ##__VA_ARGS__)
 
 #define DEBUGLW(FORMAT, ...) \
         fprintf(stdout, \
                 "%s, %s:%5d: %s::%s() WRN: " FORMAT ,\
-                TIME_STAMP, __FILENAME__, __LINE__, CLASS_NAME, FUNC_NAME, ##__VA_ARGS__);
+                TIME_STAMP, __FILENAME__, __LINE__, CLASS_NAME, FUNC_NAME, ##__VA_ARGS__)
 
 #define DEBUGLD(FORMAT, ...) \
         fprintf(stdout, \
                 "%s, %s:%5d: %s::%s() INF: " FORMAT ,\
-                TIME_STAMP, __FILENAME__, __LINE__, CLASS_NAME, FUNC_NAME, ##__VA_ARGS__);
+                TIME_STAMP, __FILENAME__, __LINE__, CLASS_NAME, FUNC_NAME, ##__VA_ARGS__)
 
 }
 

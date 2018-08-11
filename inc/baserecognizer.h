@@ -16,11 +16,32 @@
 #include <ffr_precomp.h>
 #include <logger.h>
 
+#include <featuresrecognizer.h>
+
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
+#include <set>
+
 namespace FFR {
+
+typedef std::set<FFR::String> ResultsSet;
+typedef std::set<FFR::Feature> FeaturesSet;
+
+//! wrapper for features recognizer ptr to manage memory automatically
+struct FFRecognizer {
+  FFR::FeaturesRecognizer *fr;
+  FFRecognizer()
+      : fr(NULL) {
+  }
+  ~FFRecognizer() {
+    if (fr) {
+      delete fr;
+      fr = NULL;
+    }
+  }
+};
 
 /**
  * Class to interact with the FeaturesRecognizer and with the UI.
@@ -36,6 +57,12 @@ class BaseRecognizer {
   // simple test for logger
   void printLog(void);
 
+  // setters and getters
+ public:
+  void setFeaturesToRecognize(FeaturesSet f) {
+    m_features = f;
+  }
+
  public:
   ErrorCode readVideoFromFile(const std::string& vidFileName = "test.m4v");
   ErrorCode readVideoFromCam(const int id = 0);
@@ -43,8 +70,22 @@ class BaseRecognizer {
                        cv::Mat& frame_gray);
 
  private:
+  FeaturesSet m_features;
+  int m_fontFace;
+  double m_fontScale;
+  cv::Scalar m_fontColor;
+  int m_lineType;
+
+ private:
   cv::CascadeClassifier m_faceCascade;
   ErrorCode readVideo(cv::VideoCapture& cap);
+  ErrorCode recognizeFeatures(const FeaturesSet& features,
+                              std::vector<ResultsSet>& results,
+                              cv::Mat& frame_gray,
+                              std::vector<cv::Rect>& faces);
+  ErrorCode drawResults(cv::Mat& frame, const std::vector<cv::Rect>& faces,
+                        const FeaturesSet& features,
+                        const std::vector<ResultsSet>& results);
 };
 
 extern int execute(int argc, char **argv);
