@@ -13,16 +13,19 @@
 #ifndef FFR_INC_BASERECOGNIZER_H_
 #define FFR_INC_BASERECOGNIZER_H_
 
+#include <ffr_precomp.h>
+#include <logger.h>
+
 #include "opencv2/core/core.hpp"
 #include "opencv2/contrib/contrib.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
-#include <logger.h>
-
 namespace FFR {
 
 /**
- * Class to contain the facial features recognition operations
+ * Class to interact with the FeaturesRecognizer and with the UI.
+ * It handles the pre-processing of the input image for feature vector
+ * generation and displaying the result on the UI
  */
 class BaseRecognizer {
  public:
@@ -33,7 +36,7 @@ class BaseRecognizer {
   void printLog(void);
 
  public:
-  // TODO: YTI, member functions and variables
+  ErrorCode detectFace(const std::string& vidFileName = "test.m4v");
 };
 
 extern int execute(int argc, char **argv);
