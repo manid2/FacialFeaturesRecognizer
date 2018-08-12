@@ -43,7 +43,12 @@
 # ---------------------------------------------------------------------------
 import os
 import cv2
+import glob
+import random
 import numpy as np
+from numpy.linalg import norm
+import py_ffr_util as ffr_util
+from py_ffr_util import *
 
 # ---------------------------------------------------------------------------
 # Module info
@@ -54,29 +59,45 @@ __license__ = "GNU GPL v3"
 __copyright__ = "Copyright (c) Mani Kumar - 2018"
 
 # ---------------------------------------------------------------------------
-# Module constants
-# ---------------------------------------------------------------------------
-dirsep = os.sep  # directory path separator
-curdir = os.curdir  # Relative current directory i.e. '.'
-cwdpath = os.getcwd()  # current working directory full path name
-
-# Age
-AgeList = ["child [5-10]", "teen [11-20]", "adult [21-40]", "old [40+]"]
-# Emotions
-EmotionList = ["anger", "contempt", "happy", "neutral", "sad", "surprise"]
-# Gender
-GenderList = ["male", "female"]
-
-# ---------------------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------------------
-import py_ffr_util
+def get_hog_features(img):
+    # FIXME, not working
+    #h_features = hog.compute(img)
+    # below code taken from opencv sample digits.py, it looks like HOG implementation
+    gx = cv2.Sobel(img, cv2.CV_32F, 1, 0)
+    gy = cv2.Sobel(img, cv2.CV_32F, 0, 1)
+    mag, ang = cv2.cartToPolar(gx, gy)
+    bin_n = 16
+    bin = np.int32(bin_n*ang/(2*np.pi))
+    bin_cells = bin[:10,:10], bin[10:,:10], bin[:10,10:], bin[10:,10:]
+    mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
+    hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
+    hist = np.hstack(hists)
+
+    # transform to Hellinger kernel
+    eps = 1e-7
+    hist /= hist.sum() + eps
+    hist = np.sqrt(hist)
+    hist /= norm(hist) + eps
+    return np.float32(hist)
+
 
 # Set the classifier as a opencv svm with SVM_LINEAR kernel
-maxRuns = 100
+maxRuns = 1
 runCount = 0
 svm = cv2.SVM()
-predictionAccuracyList = [0] * maxRuns
+hog = cv2.HOGDescriptor() # TODO: test with the built in function
+feature_type = "Gender"
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+
+print "-> Loading opencv SVM"
+svm_model_name = ".{0}models{1}cv2_svm_{2}_model.yml".format(dirsep,
+                                                             dirsep, 
+                                                             feature_type)
+svm.load(svm_model_name) # TODO: setup  svm model filename
+print "-> Loaded opencv SVM=[{}]".format(svm_model_name)
+
 
 for runCount in range(0, maxRuns):
     # Get a sample for prediction
@@ -87,25 +108,14 @@ for runCount in range(0, maxRuns):
     else:
         print "File name is: {}".format(fileName)
     # Get landmark features from the image.
-    image = cv2.imread(fileName)
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # TODO: YTI, hog features generation here
-
-    print "\n#################### Loading opencv SVM ####################\n"
-    # Load opencv SVM trained model.
-    svm.load("TODO") # TODO: setup  svm model filename
+    img_gray = cv2.imread(fileName, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+    img_histeq = cv2.equalizeHist(img_gray)
+    faces = face_cascade.detectMultiScale(img_histeq, 1.1, 3)
+    for f in faces:
+        x, y, w, h = [v for v in f]
+        crop_face = img_histeq[y:y + h, x:x + w]
+        c_face_resize = cv2.resize(crop_face, (50, 50))
+        hog_fv = get_hog_features(c_face_resize)
+        result = svm.predict(hog_fv)
+        print "result={}-{}".format(result, ffr_util.FeatureType[feature_type][int(result)])
     
-    print "Loading opencv SVM model from file - Completed."
-    print "\n#################### Testing opencv SVM ####################\n"
-    # result = svm.predict(npArrTestData)
-    print "Testing opencv SVM linear {0} - Completed.".format(runCount)
-    print "\n#################### Result ####################\n"
-    # print "result: emotionsList[{0}] = {1}".format(result,
-    #                                               emotionsList[int(result)])
-    predictionAccuracyList.append(result)
-    print "---------------------------------------------------------------"
-
-# Get the mean accuracy of the i runs
-print "Mean value of predict accuracy in {0} runs: {1:.4f}".format(
-    maxRuns, np.mean(predictionAccuracyList))
-# sum(predictionAccuracyList) / len(predictionAccuracyList)
