@@ -46,6 +46,7 @@ import cv2
 import glob
 import random
 import numpy as np
+from numpy.linalg import norm
 import py_ffr_util as ffr_util
 from py_ffr_util import *
 
@@ -98,8 +99,25 @@ hog = cv2.HOGDescriptor()
 
 
 def get_hog_features(img):
-    h_features = hog.compute(img)
-    return h_features
+    # FIXME, not working
+    #h_features = hog.compute(img)
+    # below code taken from opencv sample digits.py, it looks like HOG implementation
+    gx = cv2.Sobel(img, cv2.CV_32F, 1, 0)
+    gy = cv2.Sobel(img, cv2.CV_32F, 0, 1)
+    mag, ang = cv2.cartToPolar(gx, gy)
+    bin_n = 16
+    bin = np.int32(bin_n*ang/(2*np.pi))
+    bin_cells = bin[:10,:10], bin[10:,:10], bin[:10,10:], bin[10:,10:]
+    mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
+    hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
+    hist = np.hstack(hists)
+
+    # transform to Hellinger kernel
+    eps = 1e-7
+    hist /= hist.sum() + eps
+    hist = np.sqrt(hist)
+    hist /= norm(hist) + eps
+    return np.float32(hist)
 
 
 # --- svm objects
@@ -121,11 +139,11 @@ def test_svm(test_data):
     return results
 
 
-def check_accuracy(predication_labels, result_labels):  # predication_labels, result_labels
+def check_accuracy(prediction_labels, result_labels):  # predication_labels, result_labels
     print "\t\t\t<- check accuracy ->"
-    mask = predication_labels == result_labels
+    mask = prediction_labels == result_labels
     correct = np.count_nonzero(mask)
-    accuracy = correct * 100.0 / results.size
+    accuracy = correct * 100.0 / result_labels.size
     print "\t\t\t\t-> Prediction accuracy = %{0}.\n".format(accuracy)
     return accuracy
 
@@ -135,44 +153,46 @@ def main():
     Main function - start of the program.
     """
     print "main() - Enter"
-    maxRuns = 1
-    runCount = 0
-    predictionAccuracyList = [0] * maxRuns
 
     for ft in ffr_util.FeatureType:
         # ---------------------- Iterate through each feature type  -----------
         print "\t<--- Checking feature type [{0}] - Enter --->".format(ft)
-
+        maxRuns = 1
+        runCount = 0
+        predictionAccuracyList = []
         for runCount in range(0, maxRuns):
             print "\t\t<--- Run count=[{0}] --->".format(runCount)
             training_data, training_labels, prediction_data, prediction_labels = \
                 make_sets(ft)
             # for each preproccessed face compute hog
-            training_data = [get_hog_features(p_face)
-                             for p_face in training_data]
+            #print "tr_data: ", type(training_data), ", ", len(training_data)
+            t_data = []
+            for t_img in training_data:
+                t_data.append(get_hog_features(t_img))
+                #print "t_data: {}, {}, {}".format(type(t_data), len(t_data), t_data[0])
             # convert hog features data to numpy array            
-            training_data = np.asarray(training_data, dtype=np.float32)
-            training_labels = np.asarray(training_labels, dtype=np.float32)
+            training_data = np.float32(t_data)
+            training_labels = np.float32(training_labels)
             # ---------------------- Training opencv SVM ----------------------
-            #train_svm(training_data, training_labels)
-            print "\t\t\t<- training opencv SVM ->"
-            svm.train(training_data, training_labels, params=svm_params)
-
+            train_svm(training_data, training_labels)
+            
             # Save opencv SVM trained model.
             svm_model_name = ".{0}models{1}cv2_svm_{2}_model.yml".format(dirsep,
                                                                          dirsep, ft)
-            # TODO: svm.save(svm_model_name)
+            svm.save(svm_model_name)
             print "\t\t\t<- Saving OpenCV SVM model to file=[{0}] ->".format(svm_model_name)
 
             # ------------------- Testing opencv SVM --------------------------
-            prediction_data = np.float32(prediction_data)
-            prediction_data = [get_hog_features(
-                p_face) for p_face in prediction_data]
+            p_data = []
+            for p_img in prediction_data:
+                p_data.append(get_hog_features(p_img))
+            # convert hog features data to numpy array            
+            prediction_data = np.float32(p_data)
             result_labels = test_svm(prediction_data)
 
             # ------------------- Check Accuracy ------------------------------
             prediction_accuracy = check_accuracy(
-                predication_labels, result_labels)
+                prediction_labels, result_labels)
             predictionAccuracyList.append(prediction_accuracy)
 
         # ------------------ Get the mean accuracy of the N runs --------------

@@ -60,9 +60,9 @@ AgeListNo = ["adult [20-40]", "child [5-10]", "old [40+]", "teen [10-20]"]
 # Emotions
 EmotionList = ["anger", "contempt", "happy", "neutral", "sad", "surprise"]
 # Gender
-GenderList = ["male", "female"]
+GenderList =  ["male", "female"]
 
-FeatureType = {"Age": AgeList, "Emotion": EmotionList, "Gender": GenderList}
+FeatureType =  { "Gender": GenderList, "Age": AgeList, "Emotion": EmotionList}  
 
 
 # ---------------------------------------------------------------------------
