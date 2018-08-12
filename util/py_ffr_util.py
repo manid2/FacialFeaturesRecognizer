@@ -128,4 +128,4 @@ def get_dataset(ft, fv):
     training_labels = [FeatureType[ft].index(fv)] * len(training_data)
     prediction_labels = [FeatureType[ft].index(fv)] * len(prediction_data)
     print "\n get_datasets({0}, {1}) - exit".format(ft, fv)
-    return training_data, prediction_data, training_labels, prediction_labels
+    return training_data, training_labels, prediction_data, prediction_labels

@@ -60,9 +60,6 @@ __copyright__ = "Copyright (c) Mani Kumar - 2018"
 # ---------------------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------------------
-def get_hog(face_img):
-    # TODO: YTI, hog fv generation
-    return hog
 
 
 def make_sets(ft):
@@ -82,54 +79,54 @@ def make_sets(ft):
     i = 0
     for fv in ffr_util.FeatureType[ft]:
         print "\t\t\t\t{} {}".format(i, fv)
-        i += 1        
+        tr_data = []
+        tr_labels = []
+        pr_data = []
+        pr_labels = []
+        tr_data, tr_labels, pr_data, pr_labels = ffr_util.get_dataset(ft, fv)
+        training_data += tr_data
+        training_labels += tr_labels
+        prediction_data += pr_data
+        prediction_labels += pr_labels
+        i += 1
     return training_data, training_labels, prediction_data, prediction_labels
+
+
+# --- HOG objects
+hog = cv2.HOGDescriptor()
+
+
+def get_hog_features(img):
+    h_features = hog.compute(img)
+    return h_features
 
 
 # --- svm objects
 svm = cv2.SVM()
 svm_params = dict(kernel_type=cv2.SVM_LINEAR,
-                      svm_type=cv2.SVM_C_SVC,
-                      C=2.67,
-                      gamma=5.383)
+                  svm_type=cv2.SVM_C_SVC,
+                  C=2.67,
+                  gamma=5.383)
 
 
-def train_svm(): # train_data, labels, params
-    # TODO: YTI
+def train_svm(train_data, train_labels):  # train_data, labels
     print "\t\t\t<- training opencv SVM ->"
-    """
-    # TODO: YTI, training SVM
-    print "Training opencv SVM linear {0} - Started.".format(runCount)
-    svm.train(npArrTrainData, npArrTrainLabels, params=svm_params)
-    print "Training opencv SVM linear {0} - Completed.".format(runCount)
-    """
+    svm.train(train_data, train_labels, params=svm_params)
 
-def test_svm(): # test_data
-    # TODO: YTI
+
+def test_svm(test_data):
     print "\t\t\t<- testing opencv SVM->"
-    """
-    # TODO: YTI, Testing SVM
-    print "Testing opencv SVM linear {0} - Started.".format(runCount)
-    results = svm.predict_all(npArrTestData).reshape((-1,))
-    print "Testing opencv SVM linear {0} - Completed.".format(runCount)
-    """
+    results = svm.predict_all(test_data).reshape((-1,))
+    return results
 
-def check_accuracy():
-    # TODO, YTI
+
+def check_accuracy(predication_labels, result_labels): # predication_labels, result_labels
     print "\t\t\t<- check accuracy ->"
-    """
-    mask = results == npArrTestLabels
+    mask = predication_labels == result_labels
     correct = np.count_nonzero(mask)
-    print "\t-> type(mask) = {}".format(type(mask))
-    print "\t-> type(mask[0]) = {}".format(type(mask[0]))
-    print "\t-> mask.size = {}, mask.shape = {}".format(mask.size,
-                                                        mask.shape)
-    pred_accur = correct * 100.0 / results.size
-    print "\nPrediction accuracy = %{0}.\n".format(pred_accur)
-    print "--------------------------------------------------------------"
-    predictionAccuracyList[runCount] = pred_accur
-    # predictionAccuracyList.append(pred_accur)
-    """
+    accuracy = correct * 100.0 / results.size
+    print "\t\t\t\t-> Prediction accuracy = %{0}.\n".format(accuracy)
+    return accuracy
 
 
 def main():
@@ -142,32 +139,41 @@ def main():
     predictionAccuracyList = [0] * maxRuns
 
     for ft in ffr_util.FeatureType:
-        # ---------------------- Iterate through each feature type  ----------------------
+        # ---------------------- Iterate through each feature type  -----------
         print "\t<--- Checking feature type [{0}] - Enter --->".format(ft)
 
         for runCount in range(0, maxRuns):
             print "\t\t<--- Run count=[{0}] --->".format(runCount)
             training_data, training_labels, prediction_data, prediction_labels = \
                 make_sets(ft)
+            # for each preproccessed face compute hog
+            training_data = [get_hog_features(p_face) for p_face in training_data]            
+            # convert hog features data to numpy array
+            training_data = np.float32(training_data)            
+            training_labels = np.float32(training_labels)            
             # ---------------------- Training opencv SVM ----------------------
-            train_svm() # TODO: YTI
+            train_svm(training_data, training_labels)
 
             # Save opencv SVM trained model.
-            svm_model_name = ".{0}data{1}cv2_svm_{2}_model.yml".format(dirsep,
-                                                                dirsep, ft)
+            svm_model_name = ".{0}models{1}cv2_svm_{2}_model.yml".format(dirsep,
+                                                                       dirsep, ft)
             # TODO: svm.save(svm_model_name)
             print "\t\t\t<- Saving OpenCV SVM model to file=[{0}] ->".format(svm_model_name)
 
             # ------------------- Testing opencv SVM --------------------------
-            test_svm()  # TODO: YTI
+            prediction_data = np.float32(prediction_data)
+            prediction_data = [get_hog_features(p_face) for p_face in prediction_data]
+            result_labels = test_svm(prediction_data)
 
-            # ------------------- Check Accuracy ---------------------------------
-            check_accuracy() # TODO: YTI
+            # ------------------- Check Accuracy ------------------------------
+            prediction_accuracy = check_accuracy(predication_labels, result_labels)
+            predictionAccuracyList.append(prediction_accuracy)
 
         # ------------------ Get the mean accuracy of the N runs --------------
-        #print "Mean value of predict accuracy in {0} runs: {1:.4f}".format(
-        #maxRuns, sum(predictionAccuracyList) / len(predictionAccuracyList))
+        print "\t-> mean prediction accuracy for {0} runs: {1:.4f}".format(
+        maxRuns, sum(predictionAccuracyList) / len(predictionAccuracyList))
     print "main() - Exit"
+
 
 if __name__ == '__main__':
     main()
