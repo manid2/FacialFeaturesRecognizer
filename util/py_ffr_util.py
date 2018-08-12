@@ -69,23 +69,23 @@ FeatureType = {"Age": AgeList, "Emotion": EmotionList, "Gender": GenderList}
 # Functions
 # ---------------------------------------------------------------------------
 def get_images(folderName):
-    print "\t\t\t\t-> get_images({}) - enter".format(folderName)
+    #print "\t\t\t\t-> get_images({}) - enter".format(folderName)
     file_list = glob.glob(folderName)
     file_list = [os.path.abspath(f) for f in file_list]
     file_list.sort()
     images = []
     for file in file_list:
-        print "\t\t\t\t\t-> file=[{}]".format(file)
-        img_gray = cv2.imread(file)
-        print "\t\t\t\t\t-> img_gray={}".format(img_gray.shape)
+        #print "\t\t\t\t\t-> file=[{}]".format(file)
+        img_gray = cv2.imread(file, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+        #print "\t\t\t\t\t-> img_gray={}".format(img_gray.shape)
         images.append(img_gray)    
     #print "\t\t\t\t\t-> file_list[49]={}".format(file_list[49])
-    print "\t\t\t\t\t-> image[49]={}".format(images[49].shape)
+    #print "\t\t\t\t\t-> image[49]={}".format(images[49].shape)
     return images
 
 
 def get_cropped_faces(img_list):
-    print "\t\t\t\t-> get_cropped_faces(), len(img_list)=[{0}] - enter".format(len(img_list))
+    #print "\t\t\t\t-> get_cropped_faces(), len(img_list)=[{0}] - enter".format(len(img_list))
     face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
     cropped_faces = []
     for img in img_list:
@@ -96,12 +96,12 @@ def get_cropped_faces(img_list):
             x, y, w, h = [v for v in f]
             crop_face = img[y:y + h, x:x + w]
             cropped_faces.append(crop_face)
-    cv2.imwrite("mani_debug_cropped_face.jpg", cropped_faces[0])
+    #cv2.imwrite("mani_debug_cropped_face.jpg", cropped_faces[0])
     return cropped_faces
 
 
 def get_preprocessed_faces(inFolderName):
-    print "\t\t\t\t-> get_preprocessed_faces({0}) - enter".format(inFolderName)
+    #print "\t\t\t\t-> get_preprocessed_faces({0}) - enter".format(inFolderName)
     cropped_faces = get_cropped_faces(get_images(inFolderName))
     preprocessed_faces = []
     for c_face in cropped_faces:
@@ -126,7 +126,7 @@ def get_dataset(ft, fv):
        training, prediction : list of str => list of images for training
                             and prediction
     """
-    print "\t\t\t\t-> get_datasets({0}, {1}) - enter".format(ft, fv)
+    #print "\t\t\t\t-> get_datasets({0}, {1}) - enter".format(ft, fv)
     folderName = ".{0}FFR_dataset{1}{2}{3}{4}{5}*".format(dirsep,
                                                           dirsep,
                                                           ft,
