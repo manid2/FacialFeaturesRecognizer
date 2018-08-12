@@ -22,7 +22,7 @@
 
 @purpose:
 ------------------------------------------------------------------------------
-    To perform pre-processing tasks and automate repetitive tasks. 
+    To perform pre-processing tasks and automate repetitive tasks.
 ------------------------------------------------------------------------------
 
 @based_on:
@@ -44,6 +44,7 @@
 import os
 import cv2
 import glob
+import random
 import numpy as np
 
 # ---------------------------------------------------------------------------
@@ -61,7 +62,7 @@ EmotionList = ["anger", "contempt", "happy", "neutral", "sad", "surprise"]
 # Gender
 GenderList = ["male", "female"]
 
-FeatureType = {"Age" : AgeList, "Emotion" : EmotionList, "Gender": GenderList}
+FeatureType = {"Age": AgeList, "Emotion": EmotionList, "Gender": GenderList}
 
 
 # ---------------------------------------------------------------------------
@@ -70,28 +71,28 @@ FeatureType = {"Age" : AgeList, "Emotion" : EmotionList, "Gender": GenderList}
 def get_images(folderName):
     image_list = glob.glob(folderName)
     image_list.sort()
-    images = [cv2.imread(img, cv2.CV_LOAD_IMAGE_GRAYSCALE) for img in image_list]    
+    images = [cv2.imread(img, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+              for img in image_list]
     return images
 
 
-def detect_faces(img_list):    
+def get_cropped_faces(img_list):
     face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-    face_locations = []
+    cropped_faces = []
     for img in img_list:
-        face_locations.append(face_cascade.detectMultiScale(img, 1.1, 3))
-    return face_locations
+        faces = face_cascade.detectMultiScale(img, 1.1, 3, 0, (30, 30))
+        for f in faces:
+            x, y, w, h = [v for v in f]
+            crop_face = img[y:y + h, x:x + w]
+            cropped_faces.append(crop_face)
+    return cropped_faces
 
 
-def get_preprocessed_faces(inputFolderName):    
-    images = get_images(inputFolderName)
-    face_locations = detect_faces(images)
-    preprocessed_faces = []    
-    for i in range(len(images)):
-        img = images[i]
-        temp = face_locations[i]
-        [y, x, h, w] = temp[0]
-        img_face = img[ x:x + w, y:y + h]
-        img_histeq = cv2.equalizeHist(img_face)
+def get_preprocessed_faces(inFolderName):
+    cropped_faces = get_cropped_faces(get_images(inFolderName))
+    preprocessed_faces = []
+    for c_face in cropped_faces:
+        img_histeq = cv2.equalizeHist(c_face)
         img_resize = cv2.resize(img_histeq, (50, 50))
         preprocessed_faces.append(img_resize)
     return preprocessed_faces
@@ -111,16 +112,20 @@ def get_dataset(ft, fv):
        training, prediction : list of str => list of images for training
                             and prediction
     """
-    print "\n get_datasets({0}, {1}) - Enter".format(ft, fv)
+    print "\n get_datasets({0}, {1}) - enter".format(ft, fv)
     folderName = ".{0}FFR_dataset{1}{2}{3}{4}{5}*".format(dirsep,
-                                                               dirsep,
-                                                               ft,
-                                                               dirsep,
-                                                               fv,
-                                                               dirsep)
+                                                          dirsep,
+                                                          ft,
+                                                          dirsep,
+                                                          fv,
+                                                          dirsep)
     p_faces = get_preprocessed_faces(folderName)
     random.shuffle(p_faces)
-    training = p_faces[:int(len(p_faces) * 0.8)]  # get first 80% of file list
-    prediction = p_faces[-int(len(p_faces) * 0.2):]  # get last 20% of file list
-    print "\n get_datasets({0}, {1}) - Enter".format(ft, fv)
-    return training, prediction
+    # get first 80% of file list
+    training_data = p_faces[:int(len(p_faces) * 0.8)]
+    # get last 20% of file list
+    prediction_data = p_faces[-int(len(p_faces) * 0.2):]
+    training_labels = [FeatureType[ft].index(fv)] * len(training_data)
+    prediction_labels = [FeatureType[ft].index(fv)] * len(prediction_data)
+    print "\n get_datasets({0}, {1}) - exit".format(ft, fv)
+    return training_data, prediction_data, training_labels, prediction_labels

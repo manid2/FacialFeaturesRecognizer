@@ -82,8 +82,7 @@ def make_sets(ft):
     i = 0
     for fv in ffr_util.FeatureType[ft]:
         print "\t\t\t\t{} {}".format(i, fv)
-        i += 1
-        # TODO: YTI, get dataset for this
+        i += 1        
     return training_data, training_labels, prediction_data, prediction_labels
 
 
@@ -138,7 +137,7 @@ def main():
     Main function - start of the program.
     """
     print "main() - Enter"
-    maxRuns = 10
+    maxRuns = 1
     runCount = 0
     predictionAccuracyList = [0] * maxRuns
 
