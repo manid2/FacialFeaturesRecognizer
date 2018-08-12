@@ -84,6 +84,7 @@ def make_sets(ft):
         pr_data = []
         pr_labels = []
         tr_data, tr_labels, pr_data, pr_labels = ffr_util.get_dataset(ft, fv)
+        #print "\t\t\t\tmani_debug: ", type(tr_data), ", tr_data", tr_data
         training_data += tr_data
         training_labels += tr_labels
         prediction_data += pr_data
@@ -120,7 +121,7 @@ def test_svm(test_data):
     return results
 
 
-def check_accuracy(predication_labels, result_labels): # predication_labels, result_labels
+def check_accuracy(predication_labels, result_labels):  # predication_labels, result_labels
     print "\t\t\t<- check accuracy ->"
     mask = predication_labels == result_labels
     correct = np.count_nonzero(mask)
@@ -147,31 +148,36 @@ def main():
             training_data, training_labels, prediction_data, prediction_labels = \
                 make_sets(ft)
             # for each preproccessed face compute hog
-            training_data = [get_hog_features(p_face) for p_face in training_data]            
-            # convert hog features data to numpy array
-            training_data = np.float32(training_data)            
-            training_labels = np.float32(training_labels)            
+            training_data = [get_hog_features(p_face)
+                             for p_face in training_data]
+            # convert hog features data to numpy array            
+            training_data = np.asarray(training_data, dtype=np.float32)
+            training_labels = np.asarray(training_labels, dtype=np.float32)
             # ---------------------- Training opencv SVM ----------------------
-            train_svm(training_data, training_labels)
+            #train_svm(training_data, training_labels)
+            print "\t\t\t<- training opencv SVM ->"
+            svm.train(training_data, training_labels, params=svm_params)
 
             # Save opencv SVM trained model.
             svm_model_name = ".{0}models{1}cv2_svm_{2}_model.yml".format(dirsep,
-                                                                       dirsep, ft)
+                                                                         dirsep, ft)
             # TODO: svm.save(svm_model_name)
             print "\t\t\t<- Saving OpenCV SVM model to file=[{0}] ->".format(svm_model_name)
 
             # ------------------- Testing opencv SVM --------------------------
             prediction_data = np.float32(prediction_data)
-            prediction_data = [get_hog_features(p_face) for p_face in prediction_data]
+            prediction_data = [get_hog_features(
+                p_face) for p_face in prediction_data]
             result_labels = test_svm(prediction_data)
 
             # ------------------- Check Accuracy ------------------------------
-            prediction_accuracy = check_accuracy(predication_labels, result_labels)
+            prediction_accuracy = check_accuracy(
+                predication_labels, result_labels)
             predictionAccuracyList.append(prediction_accuracy)
 
         # ------------------ Get the mean accuracy of the N runs --------------
         print "\t-> mean prediction accuracy for {0} runs: {1:.4f}".format(
-        maxRuns, sum(predictionAccuracyList) / len(predictionAccuracyList))
+            maxRuns, sum(predictionAccuracyList) / len(predictionAccuracyList))
     print "main() - Exit"
 
 
