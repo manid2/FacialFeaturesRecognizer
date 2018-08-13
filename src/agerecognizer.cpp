@@ -14,13 +14,16 @@
 
 namespace FFR {
 
+bool AgeRecognizer::isSVMLoaded = false;
+
 AgeRecognizer::AgeRecognizer()
     : _className(FUNC_NAME) {
+  m_recognizerName = TO_STR(Age);
   m_result = AGE_RESULT_ADULT;
 }
 
 AgeRecognizer::~AgeRecognizer() {
-  // TODO Auto-generated destructor stub
+  DEBUGLD("destructor called!");
 }
 
 FFR::String AgeRecognizer::getResult() {

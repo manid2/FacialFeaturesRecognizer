@@ -25,6 +25,9 @@ class EmotionRecognizer : public FeaturesRecognizer {
 
  public:
   virtual FFR::String getResult(void) override;
+
+ private:
+  static bool isSVMLoaded;
 };
 
 } /* namespace FFR */

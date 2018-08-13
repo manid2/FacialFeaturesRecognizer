@@ -14,13 +14,15 @@
 
 namespace FFR {
 
+bool GenderRecognizer::isSVMLoaded = false;
+
 GenderRecognizer::GenderRecognizer()
     : _className(FUNC_NAME) {
   m_result = GENDEDR_RESULT_MALE;
 }
 
 GenderRecognizer::~GenderRecognizer() {
-  // TODO Auto-generated destructor stub
+  DEBUGLD("destructor called!");
 }
 
 FFR::String GenderRecognizer::getResult() {

@@ -16,6 +16,8 @@
 #include <ffr_precomp.h>
 #include <logger.h>
 
+#include "opencv2/ml/ml.hpp"
+
 namespace FFR {
 
 /**
@@ -27,12 +29,24 @@ class FeaturesRecognizer {
   FeaturesRecognizer();
   virtual ~FeaturesRecognizer();
 
+  // setters n getters
+  void setHOGFeatures(const std::vector<float>& h) {
+    m_HOGFeatures = h;
+  }
+
  protected:
+  FFR::String m_recognizerName;
   FFR::String m_result;
+  std::vector<float> m_HOGFeatures;
+
+  // TODO: refactor code to avoid load SVM model only once
+  CvSVM m_SVMobj;
+  CvSVMParams m_SVMParams;  // doesnt have cv namespace
 
  public:
   // TODO: getResult must receive HOG fv as input arg
   virtual FFR::String getResult(void)=0;
+  virtual bool loadSVM(const FFR::String& filename = "");
 };
 
 extern FeaturesRecognizer* getRecognizer(FFR::Feature);

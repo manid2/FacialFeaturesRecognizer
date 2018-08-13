@@ -93,6 +93,22 @@ ErrorCode BaseRecognizer::readVideo(cv::VideoCapture& cap) {
       break;
     }
 
+    // get all recognizers for each feature
+    bool success = true;
+    FeaturesSet::iterator itr_f = m_features.begin();
+    for (; itr_f != m_features.end(); itr_f++) {
+      FFRecognizer ffr;
+      ffr.fr = FFR::getRecognizer(*itr_f);
+      if (!ffr.fr->loadSVM()) {
+        success = false;
+        DEBUGLE("SVM load failed for [%s]\n", enum2str(*itr_f).c_str());
+        break;
+      }
+      m_ffrVec.push_back(ffr);
+    }
+    if (!success)
+      break;
+
     Mat frame;
     while (1) {
       cap >> frame;
@@ -168,13 +184,17 @@ ErrorCode BaseRecognizer::recognizeFeatures(const FeaturesSet& features,
         cv::resize(face_mat, face_mat, cv::Size(50, 50));
 
         /// 3. get HOG fv
+        std::vector<float> HOGFeatures;
+        this->computeHOG(face_mat, HOGFeatures);
 
         /// 4. make predictions for each feature
+        std::vector<FFRecognizer>::iterator itr_ffr = m_ffrVec.begin();
         FeaturesSet::iterator itr_f = features.begin();
-        for (; itr_f != features.end(); itr_f++) {
-          FFRecognizer ffr;
-          ffr.fr = FFR::getRecognizer(*itr_f);
-          results.at(fa).insert(ffr.fr->getResult());
+        for (; itr_ffr != m_ffrVec.end(); itr_f++, itr_ffr++) {
+          itr_ffr->fr->setHOGFeatures(HOGFeatures);
+          results.at(fa).insert(itr_ffr->fr->getResult());
+          /*ffr.fr->setHOGFeatures(HOGFeatures);
+           results.at(fa).insert(ffr.fr->getResult());*/
         }
       } catch (const cv::Exception& e) {
         // ignore any error after printing its message
@@ -187,6 +207,18 @@ ErrorCode BaseRecognizer::recognizeFeatures(const FeaturesSet& features,
         DEBUGLE("raised an unknown exception\n");
       }
     }
+  } while (0);
+
+  return err;
+}
+
+ErrorCode BaseRecognizer::computeHOG(const cv::Mat& img,
+                                     std::vector<float>& hog_features) {
+  ErrorCode err = FFR::OK;
+
+  do {  // for common error handling
+    // TODO: not sure how to compute HOG in OpenCV 2.4
+    m_HOGDescriptor.compute(img, hog_features);
   } while (0);
 
   return err;

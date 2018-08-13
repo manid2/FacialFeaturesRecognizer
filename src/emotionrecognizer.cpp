@@ -14,13 +14,15 @@
 
 namespace FFR {
 
+bool EmotionRecognizer::isSVMLoaded = false;
+
 EmotionRecognizer::EmotionRecognizer()
     : _className(FUNC_NAME) {
   m_result = EMOTION_RESULT_NEUTRAL;
 }
 
 EmotionRecognizer::~EmotionRecognizer() {
-  // TODO Auto-generated destructor stub
+  DEBUGLD("destructor called!");
 }
 
 FFR::String EmotionRecognizer::getResult() {

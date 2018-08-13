@@ -17,6 +17,8 @@
 
 namespace FFR {
 
+#define TO_STR(e) #e
+
 // PDF creation error codes.
 enum ErrorCode {
   OK = 0,
@@ -37,7 +39,6 @@ enum Feature {
 static std::string enum2str(Feature f) {
   std::string en;
 
-#define TO_STR(e) #e
 #define CASE(fe)\
   case fe:\
      en = TO_STR(fe);\
@@ -49,7 +50,7 @@ static std::string enum2str(Feature f) {
     CASE(Gender)
   }
 #undef CASE
-#undef TO_STR
+//#undef TO_STR
 
   return en;
 }

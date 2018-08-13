@@ -20,12 +20,33 @@ namespace FFR {
 
 FeaturesRecognizer::FeaturesRecognizer()
     : _className(FUNC_NAME) {
-  // TODO Auto-generated constructor stub
+  m_SVMParams.kernel_type = CvSVM::LINEAR;
+  m_SVMParams.svm_type = CvSVM::C_SVC;
+  m_SVMParams.C = 2.67;
+  m_SVMParams.gamma = 5.383;
 
+  // setting default values
+  m_recognizerName = "[None]";
 }
 
 FeaturesRecognizer::~FeaturesRecognizer() {
-  // TODO Auto-generated destructor stub
+  DEBUGLD("destructor called!");
+}
+
+bool FeaturesRecognizer::loadSVM(const FFR::String& /*fn*/) {
+  bool success = true;
+
+  do {  // for common error handling
+    cv::String fn = cv::format("cv2_svm_%s_model.yml",
+                               m_recognizerName.c_str());
+    if (m_SVMobj.get_var_count() == 0) {
+      DEBUGLE("Could not read the classifier %s\n", fn.c_str());
+      success = false;
+      break;
+    }
+    DEBUGLD("The classifier %s is loaded.\n", fn.c_str());
+  } while (0);
+  return success;
 }
 
 FeaturesRecognizer* getRecognizer(FFR::Feature f) {

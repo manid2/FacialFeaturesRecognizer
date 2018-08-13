@@ -76,6 +76,12 @@ class BaseRecognizer {
   cv::Scalar m_fontColor;
   int m_lineType;
 
+  std::vector<FFRecognizer> m_ffrVec;
+
+  // object detectors and ml objects
+  // TODO: using HOG default values, since there are no working samples
+  cv::HOGDescriptor m_HOGDescriptor;
+
  private:
   cv::CascadeClassifier m_faceCascade;
   ErrorCode readVideo(cv::VideoCapture& cap);
@@ -86,6 +92,7 @@ class BaseRecognizer {
   ErrorCode drawResults(cv::Mat& frame, const std::vector<cv::Rect>& faces,
                         const FeaturesSet& features,
                         const std::vector<ResultsSet>& results);
+  ErrorCode computeHOG(const cv::Mat& img, std::vector<float>& hog_features);
 };
 
 extern int execute(int argc, char **argv);
