@@ -22,7 +22,7 @@ EmotionRecognizer::EmotionRecognizer()
 }
 
 EmotionRecognizer::~EmotionRecognizer() {
-  DEBUGLD("destructor called!");
+  DEBUGLD("destructor called!\n");
 }
 
 FFR::String EmotionRecognizer::getResult() {

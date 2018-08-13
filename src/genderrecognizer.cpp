@@ -22,7 +22,7 @@ GenderRecognizer::GenderRecognizer()
 }
 
 GenderRecognizer::~GenderRecognizer() {
-  DEBUGLD("destructor called!");
+  DEBUGLD("destructor called!\n");
 }
 
 FFR::String GenderRecognizer::getResult() {

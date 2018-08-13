@@ -23,7 +23,7 @@ AgeRecognizer::AgeRecognizer()
 }
 
 AgeRecognizer::~AgeRecognizer() {
-  DEBUGLD("destructor called!");
+  DEBUGLD("destructor called!\n");
 }
 
 FFR::String AgeRecognizer::getResult() {

@@ -30,15 +30,20 @@ FeaturesRecognizer::FeaturesRecognizer()
 }
 
 FeaturesRecognizer::~FeaturesRecognizer() {
-  DEBUGLD("destructor called!");
+  DEBUGLD("destructor called!\n");
 }
 
 bool FeaturesRecognizer::loadSVM(const FFR::String& /*fn*/) {
   bool success = true;
 
   do {  // for common error handling
-    cv::String fn = cv::format("cv2_svm_%s_model.yml",
+    String cwd(
+        "/home/mani/Documents/eclipse-workspace/FacialFeaturesRecognizer_top/build/");
+    cv::String fn = cwd;
+    fn += cv::format("cv2_svm_%s_model.yml",
                                m_recognizerName.c_str());
+    // below code taken from letter_recog.cpp opencv 2.4 sample
+    m_SVMobj.load(fn.c_str());
     if (m_SVMobj.get_var_count() == 0) {
       DEBUGLE("Could not read the classifier %s\n", fn.c_str());
       success = false;
