@@ -28,10 +28,10 @@ AgeRecognizer::~AgeRecognizer() {
 
 FFR::String AgeRecognizer::getResult() {
   CvMat sample = cvMat(1, 64, CV_32FC1, &m_HOGFeatures[0]);
+  cvCreateData(&sample);
+
   float svm_res = 0.0f;
-  // FIXME seg fault,
-  // OpenCV Error: Bad argument (The SVM should be trained first) in CvSVM::predict,
-  // svm_res =  m_SVMobj.predict(&sample);
+  svm_res = m_SVMobj.predict(&sample);
 
   // TODO: need to refactor to make robust
   switch ((int) svm_res) {

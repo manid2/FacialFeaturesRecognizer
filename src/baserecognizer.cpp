@@ -104,7 +104,7 @@ ErrorCode BaseRecognizer::readVideo(cv::VideoCapture& cap) {
     for (; itr_f != m_features.end(); itr_f++) {
       //FFRecognizer ffr;
       FeaturesRecognizer* fr = FFR::getRecognizer(*itr_f);
-      if (!fr && !fr->loadSVM()) {
+      if (fr && !fr->loadSVM()) {
         success = false;
         DEBUGLE("SVM load failed for [%s]\n", enum2str(*itr_f).c_str());
         break;

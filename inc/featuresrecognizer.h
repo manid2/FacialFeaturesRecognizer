@@ -17,6 +17,7 @@
 #include <logger.h>
 
 #include "opencv2/ml/ml.hpp"
+#include "opencv2/core/core_c.h"
 
 namespace FFR {
 
