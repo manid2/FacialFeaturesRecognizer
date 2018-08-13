@@ -39,16 +39,21 @@ bool FeaturesRecognizer::loadSVM(const FFR::String& /*fn*/) {
   do {  // for common error handling
 
     cv::String fn("");  //= cwd;
-    fn += cv::format("cv2_svm_%s_model.yml",
-                               m_recognizerName.c_str());
+    fn += cv::format("cv2_svm_%s_model.yml", m_recognizerName.c_str());
     // below code taken from letter_recog.cpp opencv 2.4 sample
+    // and `sv_count` condition from OpenCV Q&A forum
     m_SVMobj.load(fn.c_str());
-    if (m_SVMobj.get_var_count() == 0) {
-      DEBUGLE("Could not read the classifier %s\n", fn.c_str());
+    int sv_count = m_SVMobj.get_support_vector_count();
+    int var_count = m_SVMobj.get_var_count();
+    if (!var_count || !sv_count) {
+      DEBUGLE(
+          "Could not read the classifier [%s], " "var_count=[%d], sv_count=[%d]\n",
+          fn.c_str(), var_count, sv_count);
       success = false;
       break;
     }
-    DEBUGLD("The classifier %s is loaded.\n", fn.c_str());
+    DEBUGLD("The classifier [%s] is loaded, var_count=[%d], sv_count=[%d]\n",
+            fn.c_str(), var_count, sv_count);
   } while (0);
   return success;
 }

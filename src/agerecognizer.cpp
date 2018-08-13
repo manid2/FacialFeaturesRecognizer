@@ -27,7 +27,32 @@ AgeRecognizer::~AgeRecognizer() {
 }
 
 FFR::String AgeRecognizer::getResult() {
-  // TODO: YTI recognition logic
+  CvMat sample = cvMat(1, 64, CV_32FC1, &m_HOGFeatures[0]);
+  float svm_res = 0.0f;
+  // FIXME seg fault,
+  // OpenCV Error: Bad argument (The SVM should be trained first) in CvSVM::predict,
+  // svm_res =  m_SVMobj.predict(&sample);
+
+  // TODO: need to refactor to make robust
+  switch ((int) svm_res) {
+    case 0:
+      m_result = AGE_RESULT_ADULT;
+      break;
+    case 1:
+      m_result = AGE_RESULT_CHILD;
+      break;
+    case 2:
+      m_result = AGE_RESULT_OLD;
+      break;
+    case 3:
+      m_result = AGE_RESULT_TEEN;
+      break;
+    default:
+      m_result = AGE_RESULT_ADULT;
+      DEBUGLW("default case, svm_res=[%lf]\n", svm_res);
+      break;
+  }
+
   return m_result;
 }
 

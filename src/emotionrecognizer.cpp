@@ -27,7 +27,38 @@ EmotionRecognizer::~EmotionRecognizer() {
 }
 
 FFR::String EmotionRecognizer::getResult() {
-  // TODO: YTI recognition logic
+  CvMat sample = cvMat(1, 64, CV_32FC1, &m_HOGFeatures[0]);
+  float svm_res = 0.0f;
+  // FIXME seg fault,
+  // OpenCV Error: Bad argument (The SVM should be trained first) in CvSVM::predict,
+  // svm_res =  m_SVMobj.predict(&sample);
+
+  // TODO: need to refactor to make robust
+  switch ((int) svm_res) {
+    case 0:
+      m_result = EMOTION_RESULT_ANGER;
+      break;
+    case 1:
+      m_result = EMOTION_RESULT_CONTEMPT;
+      break;
+    case 2:
+      m_result = EMOTION_RESULT_HAPPY;
+      break;
+    case 3:
+      m_result = EMOTION_RESULT_NEUTRAL;
+      break;
+    case 4:
+      m_result = EMOTION_RESULT_SAD;
+      break;
+    case 5:
+      m_result = EMOTION_RESULT_SAD;
+      break;
+    default:
+      m_result = EMOTION_RESULT_NEUTRAL;
+      DEBUGLW("default case, svm_res=[%lf]\n", svm_res);
+      break;
+  }
+
   return m_result;
 }
 

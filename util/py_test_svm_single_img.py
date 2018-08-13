@@ -93,7 +93,7 @@ face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 print "-> Loading opencv SVM"
 svm_model_name = ".{0}models{1}cv2_svm_{2}_model.yml".format(dirsep,
-                                                             dirsep, 
+                                                             dirsep,
                                                              feature_type)
 svm.load(svm_model_name) # TODO: setup  svm model filename
 print "-> Loaded opencv SVM=[{}]".format(svm_model_name)
@@ -116,6 +116,6 @@ for runCount in range(0, maxRuns):
         crop_face = img_histeq[y:y + h, x:x + w]
         c_face_resize = cv2.resize(crop_face, (50, 50))
         hog_fv = get_hog_features(c_face_resize)
+        print "hog_fv.shape: ", hog_fv.shape
         result = svm.predict(hog_fv)
         print "result={}-{}".format(result, ffr_util.FeatureType[feature_type][int(result)])
-    
