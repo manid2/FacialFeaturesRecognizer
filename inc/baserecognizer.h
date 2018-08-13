@@ -76,7 +76,8 @@ class BaseRecognizer {
   cv::Scalar m_fontColor;
   int m_lineType;
 
-  std::vector<FFRecognizer> m_ffrVec;
+  //std::vector<FFRecognizer> m_ffrVec;
+  std::vector<FFR::FeaturesRecognizer*> m_ffrVec;
 
   // object detectors and ml objects
   // TODO: using HOG default values, since there are no working samples

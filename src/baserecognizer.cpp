@@ -29,10 +29,15 @@ BaseRecognizer::BaseRecognizer()
   m_fontScale = 0.75f;
   m_fontColor = Scalar(240, 40, 240);
   m_lineType = 8;
+
+  m_ffrVec.reserve(m_features.size());
 }
 
 BaseRecognizer::~BaseRecognizer() {
-  // TODO: YTI
+  for (auto fr : m_ffrVec) {
+    if (fr)
+      delete fr;
+  }
 }
 
 void BaseRecognizer::printLog() {
@@ -97,14 +102,14 @@ ErrorCode BaseRecognizer::readVideo(cv::VideoCapture& cap) {
     bool success = true;
     FeaturesSet::iterator itr_f = m_features.begin();
     for (; itr_f != m_features.end(); itr_f++) {
-      FFRecognizer ffr;
-      ffr.fr = FFR::getRecognizer(*itr_f);
-      if (!ffr.fr->loadSVM()) {
+      //FFRecognizer ffr;
+      FeaturesRecognizer* fr = FFR::getRecognizer(*itr_f);
+      if (!fr && !fr->loadSVM()) {
         success = false;
         DEBUGLE("SVM load failed for [%s]\n", enum2str(*itr_f).c_str());
         break;
       }
-      m_ffrVec.push_back(ffr);
+      m_ffrVec.push_back(fr);
     }
     if (!success)
       break;
@@ -188,11 +193,13 @@ ErrorCode BaseRecognizer::recognizeFeatures(const FeaturesSet& features,
         this->computeHOG(face_mat, HOGFeatures);
 
         /// 4. make predictions for each feature
-        std::vector<FFRecognizer>::iterator itr_ffr = m_ffrVec.begin();
+        //std::vector<FFRecognizer>::iterator itr_ffr = m_ffrVec.begin();
+        std::vector<FFR::FeaturesRecognizer*>::iterator itr_ffr =
+            m_ffrVec.begin();
         FeaturesSet::iterator itr_f = features.begin();
         for (; itr_ffr != m_ffrVec.end(); itr_f++, itr_ffr++) {
-          itr_ffr->fr->setHOGFeatures(HOGFeatures);
-          results.at(fa).insert(itr_ffr->fr->getResult());
+          (*itr_ffr)->setHOGFeatures(HOGFeatures);
+          results.at(fa).insert((*itr_ffr)->getResult());
           /*ffr.fr->setHOGFeatures(HOGFeatures);
            results.at(fa).insert(ffr.fr->getResult());*/
         }

@@ -37,9 +37,8 @@ bool FeaturesRecognizer::loadSVM(const FFR::String& /*fn*/) {
   bool success = true;
 
   do {  // for common error handling
-    String cwd(
-        "/home/mani/Documents/eclipse-workspace/FacialFeaturesRecognizer_top/build/");
-    cv::String fn = cwd;
+
+    cv::String fn("");  //= cwd;
     fn += cv::format("cv2_svm_%s_model.yml",
                                m_recognizerName.c_str());
     // below code taken from letter_recog.cpp opencv 2.4 sample
