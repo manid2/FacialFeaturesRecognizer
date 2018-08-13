@@ -1,0 +1,92 @@
+## -- run 2 --
+main() - Enter
+	<--- Checking feature type [Emotion] - Enter --->
+		<--- Run count=[0] --->
+			<- make_sets(Emotion) ->
+				0 anger
+				1 contempt
+				2 happy
+				3 neutral
+				4 sad
+				5 surprise
+			<- training opencv SVM ->
+			<- Saving OpenCV SVM model to file=[./models/cv2_svm_Emotion_model.yml] ->
+			<- testing opencv SVM->
+			<- check accuracy ->
+				-> Prediction accuracy = %36.7647058824.
+
+	-> mean prediction accuracy for 1 runs: 18.3824
+	<--- Checking feature type [Gender] - Enter --->
+		<--- Run count=[0] --->
+			<- make_sets(Gender) ->
+				0 male
+				1 female
+			<- training opencv SVM ->
+			<- Saving OpenCV SVM model to file=[./models/cv2_svm_Gender_model.yml] ->
+			<- testing opencv SVM->
+			<- check accuracy ->
+				-> Prediction accuracy = %60.0.
+
+	-> mean prediction accuracy for 1 runs: 32.2549
+	<--- Checking feature type [Age] - Enter --->
+		<--- Run count=[0] --->
+			<- make_sets(Age) ->
+				0 adult
+				1 child
+				2 old
+				3 teen
+			<- training opencv SVM ->
+			<- Saving OpenCV SVM model to file=[./models/cv2_svm_Age_model.yml] ->
+			<- testing opencv SVM->
+			<- check accuracy ->
+				-> Prediction accuracy = %32.3529411765.
+
+	-> mean prediction accuracy for 1 runs: 32.2794
+main() - Exit
+
+## -- run 2 --
+main() - Enter
+	<--- Checking feature type [Emotion] - Enter --->
+		<--- Run count=[0] --->
+			<- make_sets(Emotion) ->
+				0 anger
+				1 contempt
+				2 happy
+				3 neutral
+				4 sad
+				5 surprise
+			<- training opencv SVM ->
+			<- Saving OpenCV SVM model to file=[./models/cv2_svm_Emotion_model.yml] ->
+			<- testing opencv SVM->
+			<- check accuracy ->
+				-> Prediction accuracy = %33.8235294118.
+
+	-> mean prediction accuracy for 1 runs: 33.8235
+	<--- Checking feature type [Gender] - Enter --->
+		<--- Run count=[0] --->
+			<- make_sets(Gender) ->
+				0 male
+				1 female
+			<- training opencv SVM ->
+			<- Saving OpenCV SVM model to file=[./models/cv2_svm_Gender_model.yml] ->
+			<- testing opencv SVM->
+			<- check accuracy ->
+				-> Prediction accuracy = %60.0.
+
+	-> mean prediction accuracy for 1 runs: 46.9118
+	<--- Checking feature type [Age] - Enter --->
+		<--- Run count=[0] --->
+			<- make_sets(Age) ->
+				0 adult
+				1 child
+				2 old
+				3 teen
+			<- training opencv SVM ->
+			<- Saving OpenCV SVM model to file=[./models/cv2_svm_Age_model.yml] ->
+			<- testing opencv SVM->
+			<- check accuracy ->
+				-> Prediction accuracy = %38.2352941176.
+
+	-> mean prediction accuracy for 1 runs: 44.0196
+main() - Exit
+
