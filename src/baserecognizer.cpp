@@ -123,17 +123,8 @@ ErrorCode BaseRecognizer::readVideo(cv::VideoCapture& cap) {
         break;
       }
 
-      /// Detect faces in the frame
-      cv::Mat frame_gray;
-      std::vector<Rect> faces;
-      err = this->detectFace(frame, faces, frame_gray);
-
-      /// Recognize facial features
-      std::vector<ResultsSet> results(faces.size());
-      this->recognizeFeatures(m_features, results, frame_gray, faces);
-
-      /// Draw the results on the original frame
-      this->drawResults(frame, faces, m_features, results);
+      /// read the frame as image
+      this->readImage(frame);
 
       /// Display the resulting frame
       imshow("video", frame);
@@ -148,6 +139,24 @@ ErrorCode BaseRecognizer::readVideo(cv::VideoCapture& cap) {
     }  // while(1)
   } while (0);
 
+  return err;
+}
+
+ErrorCode BaseRecognizer::readImage(cv::Mat& img) {
+  ErrorCode err = FFR::OK;
+  do {
+    /// Detect faces in the image
+    cv::Mat frame_gray;
+    std::vector<Rect> faces;
+    err = this->detectFace(img, faces, frame_gray);
+
+    /// Recognize facial features
+    std::vector<ResultsSet> results(faces.size());
+    this->recognizeFeatures(m_features, results, frame_gray, faces);
+
+    /// Draw the results on the original image
+    this->drawResults(img, faces, m_features, results);
+  } while (0);
   return err;
 }
 

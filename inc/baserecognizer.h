@@ -85,6 +85,7 @@ class BaseRecognizer {
 
  private:
   cv::CascadeClassifier m_faceCascade;
+  ErrorCode readImage(cv::Mat& img);
   ErrorCode readVideo(cv::VideoCapture& cap);
   ErrorCode recognizeFeatures(const FeaturesSet& features,
                               std::vector<ResultsSet>& results,

@@ -1,0 +1,10 @@
+%YAML:1.0
+#----------------------------------------------------
+# Input params for testing FFR
+#----------------------------------------------------
+
+# Tests params
+ENABLE_DEBUG: "true"
+
+# Tests params
+# TODO: write test image name

@@ -13,7 +13,7 @@
 #include "test_precomp.hpp"
 
 /// Test code source headers
-/*#include <testunit.h>*/
+#include <baserecognizer.h>
 
 /// declare using namespaces
 using namespace cv;
@@ -35,7 +35,7 @@ namespace {
  \***************************************************************************/
 enum eTestUnit {
   fSimpleRun = 0,
-  fTestUnit
+  readImage
 };
 
 /****************************************************************************\
@@ -45,11 +45,8 @@ enum eTestUnit {
 class test_BaseRecognizer : public cvtest::BaseTest {
  public:
   /// Test units declarations
-  bool test_fTestUnit(void);
-  /* ... */
-  /* ... */
-  /* ... */
-
+  bool test_readImage(void);
+  /* ... */  // TODO, YTI more test units
  public:
   const std::string _className;
   // ctor
@@ -68,7 +65,7 @@ class test_BaseRecognizer : public cvtest::BaseTest {
   cv::FileStorage m_fsParams;
 
   /// Class Under Test - CUT
-  /*FFR::BaseRecognizer *br;*/
+  cv::Ptr<FFR::BaseRecognizer> m_pBaseRecognizer;
 
   /// Helper methods for the test
   int read_params(const std::string& /*fileName*/);
@@ -93,23 +90,25 @@ test_BaseRecognizer::~test_BaseRecognizer() {
 void test_BaseRecognizer::test_fSimpleRun(void) {
   ts->printf(cvtest::TS::LOG,
              "test_BaseRecognizer::simple_run(), !!!HelloWorld!!!\n");
-  DEBUGLW(", !!!HelloWorld!!!\n");
+  DEBUGLW("!!!HelloWorld!!!\n");
 }
 
 int test_BaseRecognizer::read_params(const std::string& /*fileName*/) {
-  DEBUGLD(" inside read_params - enter\n");
+  DEBUGLD("enter\n");
   stringstream ss;
   m_fsParams.open(m_paramFilePath, cv::FileStorage::READ);
   if (false == m_fsParams.isOpened()) {
-    ss << "File: [" << m_paramFilePath << "], failed to open!" << "program exits!" << endl;
+    ss << "File: [" << m_paramFilePath << "], failed to open!"
+       << "program exits!" << endl;
     ts->printf(cvtest::TS::LOG, "test_BaseRecognizer::read_params(), ERR: %s\n",
                ss.str().c_str());
     return -1;
   }
 
   /// Read params here
-  /* m_DebugMode = ((string) m_fsParams[TEST_UNIT_ENABLE_DEBUG_MODE] == "true" ? true : false); */
-  DEBUGLD(" inside read_params - exit\n");
+  m_DebugMode =
+      ((string) m_fsParams[ENABLE_DEBUG_MODE] == "true" ? true : false);
+  DEBUGLD("exit\n");
   return 0;
 }
 
@@ -120,12 +119,11 @@ void test_BaseRecognizer::run(int test_id) {
   do  // for common error handling
   {
     /// initialization code
-    /* write initialization code here */
+    m_pBaseRecognizer = new FFR::BaseRecognizer();
 
     if (0 == read_params("")) {
       ts->printf(cvtest::TS::LOG,
                  "test_BaseRecognizer run() - read_params() successful!\n");
-
 #ifndef TEST_ID_CASE
 #define TEST_ID_CASE(id)\
   case id:\
@@ -134,7 +132,7 @@ void test_BaseRecognizer::run(int test_id) {
 #endif
       /// Select test unit code here
       switch (test_id) {
-        TEST_ID_CASE(fTestUnit)
+        TEST_ID_CASE(readImage)
         case fSimpleRun:
         default:
           test_fSimpleRun();
@@ -149,7 +147,7 @@ void test_BaseRecognizer::run(int test_id) {
   } while (0);
 
   if (!bSuccess) {
-    FAIL() << cv_format(" run(), ERR: %s\n", m_ss.str().c_str());
+    FAIL()<< cv_format(" run(), ERR: %s\n", m_ss.str().c_str());
     return;
   }
   ts->printf(cvtest::TS::LOG, "test_BaseRecognizer::run() - stop\n");
@@ -159,24 +157,25 @@ void test_BaseRecognizer::run(int test_id) {
  * Test Units functions definitions
  \***************************************************************************/
 // Test unit 0, testing this class itself via a simple run
-TEST(test_BaseRecognizer, simple_run)
-{
+TEST(test_BaseRecognizer, simple_run) {
   test_BaseRecognizer test;
   test.safe_run();
 }
 
 // Test unit 1, Computing V5 U value using algo 3.8
-bool test_BaseRecognizer::test_fTestUnit(void) {
+bool test_BaseRecognizer::test_readImage(void) {
   DEBUGLD(", enter\n");
   bool bSuccess = true;
   stringstream ss;
 
   do  // for common error handling
   {
-    /// TODO: write test unit code here
-    unsigned int uiErrCode = 0;  // 0 - Success, non-zero - Error
+    ErrorCode err = FFR::OK;  // 0 - Success, non-zero - Error
 
-    if (0 != uiErrCode) {
+    cv::Mat img = cv::imread("");
+    //m_pBaseRecognizer->readImage(img); // TODO: YTI.
+
+    if (FFR::OK != err) {
       bSuccess = false;
       m_ss.str("");
       m_ss << " not successful!";
@@ -189,11 +188,10 @@ bool test_BaseRecognizer::test_fTestUnit(void) {
   return bSuccess;
 }
 
-TEST(test_BaseRecognizer, fTestUnit)
-{
+TEST(test_BaseRecognizer, readImage) {
   test_BaseRecognizer test;
-  test.safe_run(static_cast<int>(fTestUnit));
+  test.safe_run(static_cast<int>(readImage));
 }
 
 }
-  // namespace
+// namespace

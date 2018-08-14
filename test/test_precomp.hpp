@@ -31,5 +31,11 @@
 #endif
 
 // Constants
+static const FFR::String ENABLE_DEBUG_MODE("ENABLE_DEBUG_MODE");
+static const std::string DIR_SEP("/");  // TODO: make it OS independent
+static const std::string INPUT_PARAMS_FILE("input_params.yml");
+static const std::string INPUT_FOLDER("data_in");
+static const std::string OUTPUT_FOLDER("data_out");
+static const std::string TMP_FOLDER("tmp");
 
 #endif // FFR_TEST_PRECOMP_H_
