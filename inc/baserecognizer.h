@@ -68,6 +68,11 @@ class BaseRecognizer {
   ErrorCode readVideoFromCam(const int id = 0);
   ErrorCode detectFace(cv::Mat& frame, std::vector<cv::Rect>& faces,
                        cv::Mat& frame_gray);
+  // for future use and useful in testing
+  ErrorCode readImageFromFile(const FFR::String& fileName, cv::Mat& img_o);
+  ErrorCode init(void);
+  ErrorCode loadClassifier(const FFR::String& fileName);
+  ErrorCode initRecognizers(void);
 
  private:
   FeaturesSet m_features;

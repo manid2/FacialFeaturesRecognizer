@@ -79,7 +79,7 @@ class test_BaseRecognizer : public cvtest::BaseTest {
 test_BaseRecognizer::test_BaseRecognizer(void)
     : _className(FUNC_NAME),
       m_DebugMode(false),
-      m_paramFilePath(ts->get_data_path()) {
+      m_paramFilePath(ts->get_data_path() + INPUT_PARAMS_FILE) {
   DEBUGLW(", m_paramFilePath = %s\n", m_paramFilePath.c_str());
 }
 
@@ -120,6 +120,7 @@ void test_BaseRecognizer::run(int test_id) {
   {
     /// initialization code
     m_pBaseRecognizer = new FFR::BaseRecognizer();
+    m_pBaseRecognizer->init();
 
     if (0 == read_params("")) {
       ts->printf(cvtest::TS::LOG,
@@ -172,8 +173,15 @@ bool test_BaseRecognizer::test_readImage(void) {
   {
     ErrorCode err = FFR::OK;  // 0 - Success, non-zero - Error
 
-    cv::Mat img = cv::imread("");
-    //m_pBaseRecognizer->readImage(img); // TODO: YTI.
+    std::string img_fileName;
+    m_fsParams[IMAGE_I] >> img_fileName;
+    DEBUGLD("reading image from [%s]\n", img_fileName.c_str());
+
+    cv::Mat img;  // = cv::imread("lena.jpg");
+    m_pBaseRecognizer->readImageFromFile(img_fileName, img);
+    std::string out_fileName("lena_processed.jpg");
+    cv::imwrite(out_fileName, img);
+    DEBUGLD("writing out image file [%s]\n", out_fileName.c_str());
 
     if (FFR::OK != err) {
       bSuccess = false;
@@ -192,6 +200,8 @@ TEST(test_BaseRecognizer, readImage) {
   test_BaseRecognizer test;
   test.safe_run(static_cast<int>(readImage));
 }
+
+// TODO: YTI, add read images in a loop to fix the results iterator issue
 
 }
 // namespace

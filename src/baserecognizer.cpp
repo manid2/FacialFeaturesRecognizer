@@ -90,29 +90,9 @@ ErrorCode BaseRecognizer::readVideo(cv::VideoCapture& cap) {
   ErrorCode err = FFR::OK;
 
   do {  // for common error handling
-    /// Load cascade classifier
-    m_faceCascade.load("haarcascade_frontalface_default.xml");
-    if (m_faceCascade.empty()) {
-      err = FFR::ImageReadError;
-      DEBUGLE("Error reading Cascade Classifier\n");
-      break;
-    }
-
-    // get all recognizers for each feature
-    bool success = true;
-    FeaturesSet::iterator itr_f = m_features.begin();
-    for (; itr_f != m_features.end(); itr_f++) {
-      //FFRecognizer ffr;
-      FeaturesRecognizer* fr = FFR::getRecognizer(*itr_f);
-      if (fr && !fr->loadSVM()) {
-        success = false;
-        DEBUGLE("SVM load failed for [%s]\n", enum2str(*itr_f).c_str());
-        break;
-      }
-      m_ffrVec.push_back(fr);
-    }
-    if (!success)
-      break;
+    /// one-time (expensive calls) initialization functions,
+    // i.e. loading models, classifiers
+    this->init();
 
     Mat frame;
     while (1) {
@@ -137,8 +117,65 @@ ErrorCode BaseRecognizer::readVideo(cv::VideoCapture& cap) {
         break;
       }
     }  // while(1)
+
+    /// TODO: YTI, finish(), to clean up resources and also to make it
+    // available outside the class, i.e. for unit testing.
   } while (0);
 
+  return err;
+}
+
+ErrorCode BaseRecognizer::init() {
+  ErrorCode err = FFR::OK;
+  do {  // for common error handling
+    this->loadClassifier("");
+    this->initRecognizers();
+  } while (0);
+  return err;
+}
+
+ErrorCode BaseRecognizer::loadClassifier(const FFR::String& /*fileName*/) {
+  ErrorCode err = FFR::OK;
+  do {  // for common error handling
+    /// Load cascade classifier
+    m_faceCascade.load("haarcascade_frontalface_default.xml");
+    if (m_faceCascade.empty()) {
+      err = FFR::ImageReadError;
+      DEBUGLE("Error reading Cascade Classifier\n");
+      break;
+    }
+  } while (0);
+  return err;
+}
+
+ErrorCode BaseRecognizer::initRecognizers(void) {
+  ErrorCode err = FFR::OK;
+  do {  // for common error handling
+    /// get recognizers for each feature
+    FeaturesSet::iterator itr_f = m_features.begin();
+    for (; itr_f != m_features.end(); itr_f++) {
+      //FFRecognizer ffr;
+      FeaturesRecognizer* fr = FFR::getRecognizer(*itr_f);
+      if (fr && !fr->loadSVM()) {
+        err = FFR::GenericError;
+        DEBUGLE("SVM load failed for [%s]\n", enum2str(*itr_f).c_str());
+        break;
+      }
+      m_ffrVec.push_back(fr);
+    }
+  } while (0);
+  return err;
+}
+
+ErrorCode BaseRecognizer::readImageFromFile(const FFR::String& fileName,
+                                            cv::Mat& img_o) {
+  ErrorCode err = FFR::OK;
+  do {  // for common error handling
+    cv::Mat img = cv::imread(fileName);  // load image in default
+    this->readImage(img);
+    img_o = img;
+    // currently using this just for unit testing, will extend in future
+  } while (0);
   return err;
 }
 
@@ -202,15 +239,14 @@ ErrorCode BaseRecognizer::recognizeFeatures(const FeaturesSet& features,
         this->computeHOG(face_mat, HOGFeatures);
 
         /// 4. make predictions for each feature
-        //std::vector<FFRecognizer>::iterator itr_ffr = m_ffrVec.begin();
+        // FIXME: not sure if the results set comes in the same expected.
+        // TODO: YTI unit test for it.
         std::vector<FFR::FeaturesRecognizer*>::iterator itr_ffr =
             m_ffrVec.begin();
         FeaturesSet::iterator itr_f = features.begin();
         for (; itr_ffr != m_ffrVec.end(); itr_f++, itr_ffr++) {
           (*itr_ffr)->setHOGFeatures(HOGFeatures);
           results.at(fa).insert((*itr_ffr)->getResult());
-          /*ffr.fr->setHOGFeatures(HOGFeatures);
-           results.at(fa).insert(ffr.fr->getResult());*/
         }
       } catch (const cv::Exception& e) {
         // ignore any error after printing its message
@@ -233,7 +269,8 @@ ErrorCode BaseRecognizer::computeHOG(const cv::Mat& img,
   ErrorCode err = FFR::OK;
 
   do {  // for common error handling
-    // TODO: not sure how to compute HOG in OpenCV 2.4
+    // NOTE: Confirmed this is the same hog function as calculated in the python
+    // script used in training the SVM model.
     m_HOGDescriptor.compute(img, hog_features);
   } while (0);
 

@@ -12,4 +12,4 @@
 
 #include "test_precomp.hpp"
 
-CV_TEST_MAIN("facialfeaturesrecognizer")
+CV_TEST_MAIN("facialfeaturesrecognizer_test")

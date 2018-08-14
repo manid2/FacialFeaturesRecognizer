@@ -88,7 +88,7 @@ maxRuns = 1
 runCount = 0
 svm = cv2.SVM()
 hog = cv2.HOGDescriptor() # TODO: test with the built in function
-feature_type = "Gender"
+feature_type = "Emotion" # TODO: make it a list to test every feature for a single image
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 print "-> Loading opencv SVM"
@@ -116,6 +116,6 @@ for runCount in range(0, maxRuns):
         crop_face = img_histeq[y:y + h, x:x + w]
         c_face_resize = cv2.resize(crop_face, (50, 50))
         hog_fv = get_hog_features(c_face_resize)
-        print "hog_fv.shape: ", hog_fv.shape
+        #print "hog_fv.shape: ", hog_fv.shape
         result = svm.predict(hog_fv)
         print "result={}-{}".format(result, ffr_util.FeatureType[feature_type][int(result)])

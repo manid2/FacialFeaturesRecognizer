@@ -38,4 +38,6 @@ static const std::string INPUT_FOLDER("data_in");
 static const std::string OUTPUT_FOLDER("data_out");
 static const std::string TMP_FOLDER("tmp");
 
+static const std::string IMAGE_I("IMAGE_I");
+
 #endif // FFR_TEST_PRECOMP_H_
