@@ -188,11 +188,13 @@ ErrorCode BaseRecognizer::readImage(cv::Mat& img) {
     err = this->detectFace(img, faces, frame_gray);
 
     /// Recognize facial features
-    std::vector<ResultsSet> results(faces.size());
-    this->recognizeFeatures(m_features, results, frame_gray, faces);
+    //std::vector<ResultsSet> results(faces.size());
+    m_resultsVec = ResultsVec(faces.size());
+    this->recognizeFeatures(m_features, m_resultsVec /*results*/, frame_gray,
+                            faces);
 
     /// Draw the results on the original image
-    this->drawResults(img, faces, m_features, results);
+    this->drawResults(img, faces, m_features, m_resultsVec /*results*/);
   } while (0);
   return err;
 }

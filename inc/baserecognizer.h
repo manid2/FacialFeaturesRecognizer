@@ -28,6 +28,7 @@ namespace FFR {
 
 typedef std::set<FFR::String> ResultsSet;
 typedef std::set<FFR::Feature> FeaturesSet;
+typedef std::vector<ResultsSet> ResultsVec;
 
 //! wrapper for features recognizer ptr to manage memory automatically
 struct FFRecognizer {
@@ -62,6 +63,9 @@ class BaseRecognizer {
   void setFeaturesToRecognize(FeaturesSet f) {
     m_features = f;
   }
+  ResultsVec getRecognitionResults(void) const {
+    return m_resultsVec;
+  }
 
  public:
   ErrorCode readVideoFromFile(const std::string& vidFileName = "test.m4v");
@@ -83,6 +87,7 @@ class BaseRecognizer {
 
   //std::vector<FFRecognizer> m_ffrVec;
   std::vector<FFR::FeaturesRecognizer*> m_ffrVec;
+  ResultsVec m_resultsVec;
 
   // object detectors and ml objects
   // TODO: using HOG default values, since there are no working samples
