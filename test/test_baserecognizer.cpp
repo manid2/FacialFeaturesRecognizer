@@ -226,10 +226,22 @@ bool test_BaseRecognizer::test_readImageInLoop(void) {
       cv::Mat img;  // = cv::imread("lena.jpg");
       m_pBaseRecognizer->readImageFromFile(in_fileName, img);
 
+#if 0 // dont write the out image
       std::string out_fileName = ts->get_data_path() + OUTPUT_FOLDER + DIR_SEP;
       out_fileName += file;
       cv::imwrite(out_fileName, img);
       DEBUGLD("writing out image file [%s]\n", out_fileName.c_str());
+#else // write recognition results
+      ResultsVec res_vec = m_pBaseRecognizer->getRecognitionResults();
+      //int fa = 0;
+      for (auto res_set : res_vec) {
+        DEBUGLD("for %s: ", file.c_str());
+        for (auto res : res_set) {
+          printf("res=[%s], ", res.c_str());
+        }
+        printf("\n");
+      }
+#endif
     }
 
     if (FFR::OK != err) {
