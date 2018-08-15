@@ -40,4 +40,11 @@ static const std::string TMP_FOLDER("tmp");
 
 static const std::string IMAGE_I("IMAGE_I");
 
+// utility global functions
+namespace test_FFR {
+extern std::vector<std::string> getAllFilesFromFolder(
+    const std::string& folder, bool ignoreHiddenFiles = true,
+    const std::string& fileExt = "jpg");
+}
+
 #endif // FFR_TEST_PRECOMP_H_

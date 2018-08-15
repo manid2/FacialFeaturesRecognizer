@@ -19,6 +19,7 @@
 using namespace cv;
 using namespace std;
 using namespace FFR;
+using namespace test_FFR;
 
 /****************************************************************************\
  * Using anonymous namespace to isolate the code in this
@@ -35,7 +36,8 @@ namespace {
  \***************************************************************************/
 enum eTestUnit {
   fSimpleRun = 0,
-  readImage
+  readImage,
+  readImageInLoop
 };
 
 /****************************************************************************\
@@ -46,7 +48,8 @@ class test_BaseRecognizer : public cvtest::BaseTest {
  public:
   /// Test units declarations
   bool test_readImage(void);
-  /* ... */  // TODO, YTI more test units
+  bool test_readImageInLoop(void);
+
  public:
   const std::string _className;
   // ctor
@@ -134,6 +137,7 @@ void test_BaseRecognizer::run(int test_id) {
       /// Select test unit code here
       switch (test_id) {
         TEST_ID_CASE(readImage)
+        TEST_ID_CASE(readImageInLoop)
         case fSimpleRun:
         default:
           test_fSimpleRun();
@@ -163,7 +167,7 @@ TEST(test_BaseRecognizer, simple_run) {
   test.safe_run();
 }
 
-// Test unit 1, Computing V5 U value using algo 3.8
+// Test unit 1, checking the single image recognition
 bool test_BaseRecognizer::test_readImage(void) {
   DEBUGLD(", enter\n");
   bool bSuccess = true;
@@ -201,7 +205,49 @@ TEST(test_BaseRecognizer, readImage) {
   test.safe_run(static_cast<int>(readImage));
 }
 
-// TODO: YTI, add read images in a loop to fix the results iterator issue
+// Test unit 2, checking the single image recognition in loop,
+// simulating the testing recognition in video case
+bool test_BaseRecognizer::test_readImageInLoop(void) {
+  DEBUGLD("enter\n");
+  bool bSuccess = true;
+  stringstream ss;
 
+  do  // for common error handling
+  {
+    ErrorCode err = FFR::OK;  // 0 - Success, non-zero - Error
+
+    std::string imgs_folderName(ts->get_data_path() + INPUT_FOLDER + DIR_SEP);
+    std::vector<string> allFiles(getAllFilesFromFolder(imgs_folderName));
+
+    for (auto file : allFiles) {
+      std::string in_fileName = imgs_folderName + file;
+      DEBUGLD("reading image from [%s]\n", in_fileName.c_str());
+
+      cv::Mat img;  // = cv::imread("lena.jpg");
+      m_pBaseRecognizer->readImageFromFile(in_fileName, img);
+
+      std::string out_fileName = ts->get_data_path() + OUTPUT_FOLDER + DIR_SEP;
+      out_fileName += file;
+      cv::imwrite(out_fileName, img);
+      DEBUGLD("writing out image file [%s]\n", out_fileName.c_str());
+    }
+
+    if (FFR::OK != err) {
+      bSuccess = false;
+      m_ss.str("");
+      m_ss << " not successful!";
+      DEBUGLE(", %s\n", m_ss.str().c_str());
+      break;
+    }
+  } while (0);
+
+  DEBUGLD("exit\n");
+  return bSuccess;
 }
-// namespace
+
+TEST(test_BaseRecognizer, readImageInLoop) {
+  test_BaseRecognizer test;
+  test.safe_run(static_cast<int>(readImageInLoop));
+}
+
+}  // namespace
