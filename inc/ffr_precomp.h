@@ -19,7 +19,7 @@ namespace FFR {
 
 #define TO_STR(e) #e
 
-// PDF creation error codes.
+//! Error codes.
 enum ErrorCode {
   OK = 0,
   GenericError = -100,
@@ -30,6 +30,7 @@ enum ErrorCode {
   FaceDetectError
 };
 
+//! Feature types
 enum Feature {
   Feature_Undefined = -1,
   Age = 0,
@@ -56,6 +57,8 @@ static std::string enum2str(Feature f) {
   return en;
 }
 
+// NOTE: the below macros must match the integer values used in
+// training the SVM models
 #define AGE_RESULT_CHILD         ("child [5-10]")
 #define AGE_RESULT_TEEN          ("teen [11-20]")
 #define AGE_RESULT_ADULT         ("adult [21-40]")

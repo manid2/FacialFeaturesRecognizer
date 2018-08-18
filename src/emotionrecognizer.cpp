@@ -14,8 +14,6 @@
 
 namespace FFR {
 
-bool EmotionRecognizer::isSVMLoaded = false;
-
 EmotionRecognizer::EmotionRecognizer()
     : _className(FUNC_NAME) {
   m_featureType = FFR::Emotion;
@@ -27,13 +25,11 @@ EmotionRecognizer::~EmotionRecognizer() {
   DEBUGLD("destructor called!\n");
 }
 
-FFR::String EmotionRecognizer::getResult() {
-  CvMat sample = cvMat(1, 64, CV_32FC1, &m_HOGFeatures[0]);
+FFR::String EmotionRecognizer::getResult(/*const*/std::vector<float>& hog_fv) {
+  CvMat sample = cvMat(1, 64, CV_32FC1, hog_fv.data());
   cvCreateData(&sample);
   float svm_res = 0.0f;
-
   svm_res = m_SVMobj.predict(&sample);
-
   // TODO: need to refactor to make robust
   switch ((int) svm_res) {
     case 0:
@@ -59,7 +55,6 @@ FFR::String EmotionRecognizer::getResult() {
       DEBUGLW("default case, svm_res=[%lf]\n", svm_res);
       break;
   }
-
   return m_result;
 }
 

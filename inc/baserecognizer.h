@@ -28,11 +28,14 @@
 namespace FFR {
 
 typedef std::set<FFR::Feature> FeaturesSet;
-typedef std::set<FFR::String> ResultsSet;
+//typedef std::set<FFR::String> ResultsSet;
 
-typedef std::pair<FFR::Feature, FFR::String> ResultPair;  // to avoid feature-result mismatch issue
-typedef std::set<ResultPair> ResultsPairSet;  // set of feature-result per face
-typedef std::vector<ResultsPairSet> ResultsVec;  // results per image, equals no of faces in the image
+// to avoid feature-result mismatch issue, we use a pair
+typedef std::pair<FFR::Feature, FFR::String> ResultPair;
+// set of feature-result per face
+typedef std::set<ResultPair> ResultsPairSet;
+// results per image, equals no of faces in the image
+typedef std::vector<ResultsPairSet> ResultsVec;
 
 /**
  * Class to interact with the FeaturesRecognizer and with the UI.
@@ -79,20 +82,18 @@ class BaseRecognizer {
   ResultsVec m_resultsVec;
 
   // object detectors and ml objects
-  // TODO: using HOG default values, since there are no working samples
+  // using HOG default values as it is used in the training SVM models
   cv::HOGDescriptor m_HOGDescriptor;
 
  private:
   cv::CascadeClassifier m_faceCascade;
   ErrorCode readImage(cv::Mat& img);
   ErrorCode readVideo(cv::VideoCapture& cap);
-  ErrorCode recognizeFeatures(const FeaturesSet& features,
-                              ResultsVec& results,
+  ErrorCode recognizeFeatures(const FeaturesSet& features, ResultsVec& results,
                               cv::Mat& frame_gray,
                               std::vector<cv::Rect>& faces);
   ErrorCode drawResults(cv::Mat& frame, const std::vector<cv::Rect>& faces,
-                        const FeaturesSet& features,
-                        const ResultsVec& results);
+                        const FeaturesSet& features, const ResultsVec& results);
   ErrorCode computeHOG(const cv::Mat& img, std::vector<float>& hog_features);
 };
 

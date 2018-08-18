@@ -61,7 +61,6 @@ ErrorCode BaseRecognizer::readVideoFromFile(const std::string& vidFileName) {
     cap.release();
     destroyAllWindows();
   } while (0);
-
   return err;
 }
 
@@ -82,7 +81,6 @@ ErrorCode BaseRecognizer::readVideoFromCam(const int id) {
     cap.release();
     destroyAllWindows();
   } while (0);
-
   return err;
 }
 
@@ -121,7 +119,6 @@ ErrorCode BaseRecognizer::readVideo(cv::VideoCapture& cap) {
     /// TODO: YTI, finish(), to clean up resources and also to make it
     // available outside the class, i.e. for unit testing.
   } while (0);
-
   return err;
 }
 
@@ -188,11 +185,10 @@ ErrorCode BaseRecognizer::readImage(cv::Mat& img) {
 
     /// Recognize facial features
     m_resultsVec = ResultsVec(faces.size());
-    this->recognizeFeatures(m_features, m_resultsVec /*results*/, frame_gray,
-                            faces);
+    this->recognizeFeatures(m_features, m_resultsVec, frame_gray, faces);
 
     /// Draw the results on the original image
-    this->drawResults(img, faces, m_features, m_resultsVec /*results*/);
+    this->drawResults(img, faces, m_features, m_resultsVec);
   } while (0);
   return err;
 }
@@ -211,7 +207,6 @@ ErrorCode BaseRecognizer::detectFace(cv::Mat& frame, std::vector<Rect>& faces,
                                    0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
 
   } while (0);
-
   return err;
 }
 
@@ -226,42 +221,26 @@ ErrorCode BaseRecognizer::recognizeFeatures(const FeaturesSet& features,
 
     cv::Mat face_mat;  // dont modify frame_gray
     for (size_t fa = 0; fa < faces.size(); fa++) {
-      /// observed seg fault here, hence putting try-catch block
-      try {
-        /// 1. crop the face from the frame
-        face_mat = frame_gray(faces.at(fa));
+      /// 1. crop the face from the frame
+      face_mat = frame_gray(faces.at(fa));
 
-        /// 2. resize to 50,50
-        cv::resize(face_mat, face_mat, cv::Size(50, 50));
+      /// 2. resize to 50,50
+      cv::resize(face_mat, face_mat, cv::Size(50, 50));
 
-        /// 3. get HOG fv
-        std::vector<float> HOGFeatures;
-        this->computeHOG(face_mat, HOGFeatures);
+      /// 3. get HOG fv
+      std::vector<float> hog_fv;
+      this->computeHOG(face_mat, hog_fv);
 
-        /// 4. make predictions for each feature
-        // FIXME: match the feature with its result
-        std::vector<FFR::FeaturesRecognizer*>::iterator itr_ffr =
-            m_ffrVec.begin();
-        for (; itr_ffr != m_ffrVec.end(); itr_ffr++) {
-          (*itr_ffr)->setHOGFeatures(HOGFeatures);
-
-          FFR::String res = (*itr_ffr)->getResult();
-          ResultPair res_pair((*itr_ffr)->getFeatureType(), res);
-          results.at(fa).insert(res_pair);
-        }
-      } catch (const cv::Exception& e) {
-        // ignore any error after printing its message
-        stringstream ss;
-        ss << faces.at(fa);
-        DEBUGLE("raised cv exception, faces[%ld]: rect=%s, face_gray\n", fa,
-                ss.str().c_str());
-      } catch (...) {
-        // ignore any error after printing its message
-        DEBUGLE("raised an unknown exception\n");
+      /// 4. make predictions for each feature
+      std::vector<FFR::FeaturesRecognizer*>::iterator itr_ffr =
+          m_ffrVec.begin();
+      for (; itr_ffr != m_ffrVec.end(); itr_ffr++) {
+        FFR::String res = (*itr_ffr)->getResult(hog_fv);
+        ResultPair res_pair((*itr_ffr)->getFeatureType(), res);
+        results.at(fa).insert(res_pair);
       }
     }
   } while (0);
-
   return err;
 }
 
@@ -295,16 +274,8 @@ ErrorCode BaseRecognizer::drawResults(cv::Mat& frame,
               Size(face_rect.width * 0.5, face_rect.height * 0.5), 0, 0, 360,
               Scalar(255, 0, 0), 4, 8, 0);
       /// 2. Draw features results text near the faces
-      /*FeaturesSet::iterator itr_f = features.begin();
-      ResultsSet::iterator itr_r = results.at(fa).begin();
-      for (int li = 0; itr_f != features.end(); itr_f++, itr_r++, li += 22) {
-        const FFR::Feature& f = *itr_f;
-        putText(frame, format("%s: %s", enum2str(f).c_str(), itr_r->c_str()),
-                Point(face_rect.x, face_rect.y + li), m_fontFace, m_fontScale,
-                m_fontColor, 2);
-       }*/
       int li = 0;
-      // for each face in results vec iterate through the results pair set
+      // for each face in the results vector iterate through the results pair set
       for (auto res_pair : results.at(fa)) {
         // extract results data here
         const FFR::Feature& f = res_pair.first;
@@ -318,7 +289,6 @@ ErrorCode BaseRecognizer::drawResults(cv::Mat& frame,
       }
     }
   } while (0);
-
   return err;
 }
 

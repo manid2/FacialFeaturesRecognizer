@@ -14,8 +14,6 @@
 
 namespace FFR {
 
-bool AgeRecognizer::isSVMLoaded = false;
-
 AgeRecognizer::AgeRecognizer()
     : _className(FUNC_NAME) {
   m_featureType = FFR::Age;
@@ -27,13 +25,11 @@ AgeRecognizer::~AgeRecognizer() {
   DEBUGLD("destructor called!\n");
 }
 
-FFR::String AgeRecognizer::getResult() {
-  CvMat sample = cvMat(1, 64, CV_32FC1, &m_HOGFeatures[0]);
+FFR::String AgeRecognizer::getResult(/*const*/std::vector<float>& hog_fv) {
+  CvMat sample = cvMat(1, 64, CV_32FC1, hog_fv.data());
   cvCreateData(&sample);
-
   float svm_res = 0.0f;
   svm_res = m_SVMobj.predict(&sample);
-
   // TODO: need to refactor to make robust
   switch ((int) svm_res) {
     case 0:
@@ -53,7 +49,6 @@ FFR::String AgeRecognizer::getResult() {
       DEBUGLW("default case, svm_res=[%lf]\n", svm_res);
       break;
   }
-
   return m_result;
 }
 

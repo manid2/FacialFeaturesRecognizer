@@ -226,18 +226,24 @@ bool test_BaseRecognizer::test_readImageInLoop(void) {
       cv::Mat img;  // = cv::imread("lena.jpg");
       m_pBaseRecognizer->readImageFromFile(in_fileName, img);
 
-#if 1 // dont write the out image
+#if 0 // dont write the out image
       std::string out_fileName = ts->get_data_path() + OUTPUT_FOLDER + DIR_SEP;
       out_fileName += file;
       cv::imwrite(out_fileName, img);
       DEBUGLD("writing out image file [%s]\n", out_fileName.c_str());
 #else // write recognition results
-      ResultsVec res_vec = m_pBaseRecognizer->getRecognitionResults();
-      //int fa = 0;
-      for (auto res_set : res_vec) {
-        DEBUGLD("for %s: ", file.c_str());
-        for (auto res : res_set) {
-          printf("res=[%s], ", res.c_str());
+      DEBUGLD("for %s: ", file.c_str());
+      ResultsVec results = m_pBaseRecognizer->getRecognitionResults();
+      for (size_t fa = 0; fa < results.size(); fa++) {
+        printf(", fa=[%ld] ", fa);
+        // for each face in the results vector iterate through the results pair set
+        for (auto res_pair : results.at(fa)) {
+          // extract results data here
+          const FFR::Feature& f = res_pair.first;
+          const FFR::String& res = res_pair.second;
+          // extract results data here
+          printf("%s",
+                 format("%s: %s", enum2str(f).c_str(), res.c_str()).c_str());
         }
         printf("\n");
       }

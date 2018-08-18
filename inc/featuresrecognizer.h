@@ -31,9 +31,6 @@ class FeaturesRecognizer {
   virtual ~FeaturesRecognizer();
 
   // setters n getters
-  void setHOGFeatures(const std::vector<float>& h) {
-    m_HOGFeatures = h;
-  }
   FFR::Feature getFeatureType(void) const {
     return m_featureType;
   }
@@ -45,14 +42,12 @@ class FeaturesRecognizer {
   FFR::Feature m_featureType;
   FFR::String m_featureName;
   FFR::String m_result;
-  std::vector<float> m_HOGFeatures;
 
   CvSVM m_SVMobj;
   CvSVMParams m_SVMParams;  // doesnt have cv namespace
 
  public:
-  // TODO: getResult must receive HOG fv as input arg
-  virtual FFR::String getResult(void)=0;
+  virtual FFR::String getResult(/*const*/std::vector<float>& hog_fv)=0;
   virtual bool loadSVM(const FFR::String& filename = "");
 };
 

@@ -24,10 +24,7 @@ class AgeRecognizer : public FeaturesRecognizer {
   virtual ~AgeRecognizer();
 
  public:
-  virtual FFR::String getResult(void) override;
-
- private:
-  static bool isSVMLoaded;
+  virtual FFR::String getResult(/*const*/std::vector<float>& hog_fv) override;
 };
 
 } /* namespace FFR */
