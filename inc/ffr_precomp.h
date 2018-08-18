@@ -31,6 +31,7 @@ enum ErrorCode {
 };
 
 enum Feature {
+  Feature_Undefined = -1,
   Age = 0,
   Emotion,
   Gender

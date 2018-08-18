@@ -18,7 +18,8 @@ bool EmotionRecognizer::isSVMLoaded = false;
 
 EmotionRecognizer::EmotionRecognizer()
     : _className(FUNC_NAME) {
-  m_recognizerName = TO_STR(Emotion);
+  m_featureType = FFR::Emotion;
+  m_featureName = enum2str(m_featureType);
   m_result = EMOTION_RESULT_NEUTRAL;
 }
 

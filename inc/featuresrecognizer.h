@@ -34,13 +34,19 @@ class FeaturesRecognizer {
   void setHOGFeatures(const std::vector<float>& h) {
     m_HOGFeatures = h;
   }
+  FFR::Feature getFeatureType(void) const {
+    return m_featureType;
+  }
+  FFR::String getFeatureName(void) const {
+    return m_featureName;
+  }
 
  protected:
-  FFR::String m_recognizerName;
+  FFR::Feature m_featureType;
+  FFR::String m_featureName;
   FFR::String m_result;
   std::vector<float> m_HOGFeatures;
 
-  // TODO: refactor code to avoid load SVM model only once
   CvSVM m_SVMobj;
   CvSVMParams m_SVMParams;  // doesnt have cv namespace
 

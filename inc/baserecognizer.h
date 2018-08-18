@@ -23,26 +23,16 @@
 #include "opencv2/imgproc/imgproc.hpp"
 
 #include <set>
+#include <utility>
 
 namespace FFR {
 
-typedef std::set<FFR::String> ResultsSet;
 typedef std::set<FFR::Feature> FeaturesSet;
-typedef std::vector<ResultsSet> ResultsVec;
+typedef std::set<FFR::String> ResultsSet;
 
-//! wrapper for features recognizer ptr to manage memory automatically
-struct FFRecognizer {
-  FFR::FeaturesRecognizer *fr;
-  FFRecognizer()
-      : fr(NULL) {
-  }
-  ~FFRecognizer() {
-    if (fr) {
-      delete fr;
-      fr = NULL;
-    }
-  }
-};
+typedef std::pair<FFR::Feature, FFR::String> ResultPair;  // to avoid feature-result mismatch issue
+typedef std::set<ResultPair> ResultsPairSet;  // set of feature-result per face
+typedef std::vector<ResultsPairSet> ResultsVec;  // results per image, equals no of faces in the image
 
 /**
  * Class to interact with the FeaturesRecognizer and with the UI.
@@ -85,7 +75,6 @@ class BaseRecognizer {
   cv::Scalar m_fontColor;
   int m_lineType;
 
-  //std::vector<FFRecognizer> m_ffrVec;
   std::vector<FFR::FeaturesRecognizer*> m_ffrVec;
   ResultsVec m_resultsVec;
 
@@ -98,12 +87,12 @@ class BaseRecognizer {
   ErrorCode readImage(cv::Mat& img);
   ErrorCode readVideo(cv::VideoCapture& cap);
   ErrorCode recognizeFeatures(const FeaturesSet& features,
-                              std::vector<ResultsSet>& results,
+                              ResultsVec& results,
                               cv::Mat& frame_gray,
                               std::vector<cv::Rect>& faces);
   ErrorCode drawResults(cv::Mat& frame, const std::vector<cv::Rect>& faces,
                         const FeaturesSet& features,
-                        const std::vector<ResultsSet>& results);
+                        const ResultsVec& results);
   ErrorCode computeHOG(const cv::Mat& img, std::vector<float>& hog_features);
 };
 

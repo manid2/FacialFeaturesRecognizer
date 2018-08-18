@@ -154,7 +154,6 @@ ErrorCode BaseRecognizer::initRecognizers(void) {
     /// get recognizers for each feature
     FeaturesSet::iterator itr_f = m_features.begin();
     for (; itr_f != m_features.end(); itr_f++) {
-      //FFRecognizer ffr;
       FeaturesRecognizer* fr = FFR::getRecognizer(*itr_f);
       if (fr && !fr->loadSVM()) {
         err = FFR::GenericError;
@@ -188,7 +187,6 @@ ErrorCode BaseRecognizer::readImage(cv::Mat& img) {
     err = this->detectFace(img, faces, frame_gray);
 
     /// Recognize facial features
-    //std::vector<ResultsSet> results(faces.size());
     m_resultsVec = ResultsVec(faces.size());
     this->recognizeFeatures(m_features, m_resultsVec /*results*/, frame_gray,
                             faces);
@@ -218,7 +216,7 @@ ErrorCode BaseRecognizer::detectFace(cv::Mat& frame, std::vector<Rect>& faces,
 }
 
 ErrorCode BaseRecognizer::recognizeFeatures(const FeaturesSet& features,
-                                            vector<ResultsSet>& results,
+                                            ResultsVec& results,
                                             cv::Mat& frame_gray,
                                             std::vector<cv::Rect>& faces) {
   ErrorCode err = FFR::OK;
@@ -241,14 +239,15 @@ ErrorCode BaseRecognizer::recognizeFeatures(const FeaturesSet& features,
         this->computeHOG(face_mat, HOGFeatures);
 
         /// 4. make predictions for each feature
-        // FIXME: not sure if the results set comes in the same expected.
-        // TODO: YTI unit test for it.
+        // FIXME: match the feature with its result
         std::vector<FFR::FeaturesRecognizer*>::iterator itr_ffr =
             m_ffrVec.begin();
-        FeaturesSet::iterator itr_f = features.begin();
-        for (; itr_ffr != m_ffrVec.end(); itr_f++, itr_ffr++) {
+        for (; itr_ffr != m_ffrVec.end(); itr_ffr++) {
           (*itr_ffr)->setHOGFeatures(HOGFeatures);
-          results.at(fa).insert((*itr_ffr)->getResult());
+
+          FFR::String res = (*itr_ffr)->getResult();
+          ResultPair res_pair((*itr_ffr)->getFeatureType(), res);
+          results.at(fa).insert(res_pair);
         }
       } catch (const cv::Exception& e) {
         // ignore any error after printing its message
@@ -282,7 +281,7 @@ ErrorCode BaseRecognizer::computeHOG(const cv::Mat& img,
 ErrorCode BaseRecognizer::drawResults(cv::Mat& frame,
                                       const std::vector<cv::Rect>& faces,
                                       const FeaturesSet& features,
-                                      const std::vector<ResultsSet>& results) {
+                                      const ResultsVec& results) {
   ErrorCode err = FFR::OK;
 
   do {  // for common error handling
@@ -296,13 +295,26 @@ ErrorCode BaseRecognizer::drawResults(cv::Mat& frame,
               Size(face_rect.width * 0.5, face_rect.height * 0.5), 0, 0, 360,
               Scalar(255, 0, 0), 4, 8, 0);
       /// 2. Draw features results text near the faces
-      FeaturesSet::iterator itr_f = features.begin();
+      /*FeaturesSet::iterator itr_f = features.begin();
       ResultsSet::iterator itr_r = results.at(fa).begin();
       for (int li = 0; itr_f != features.end(); itr_f++, itr_r++, li += 22) {
         const FFR::Feature& f = *itr_f;
         putText(frame, format("%s: %s", enum2str(f).c_str(), itr_r->c_str()),
                 Point(face_rect.x, face_rect.y + li), m_fontFace, m_fontScale,
                 m_fontColor, 2);
+       }*/
+      int li = 0;
+      // for each face in results vec iterate through the results pair set
+      for (auto res_pair : results.at(fa)) {
+        // extract results data here
+        const FFR::Feature& f = res_pair.first;
+        const FFR::String& res = res_pair.second;
+
+        // put text on the frame
+        putText(frame, format("%s: %s", enum2str(f).c_str(), res.c_str()),
+                Point(face_rect.x, face_rect.y + li), m_fontFace, m_fontScale,
+                m_fontColor, 2);
+        li += 22;
       }
     }
   } while (0);

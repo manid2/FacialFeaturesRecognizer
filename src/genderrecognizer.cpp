@@ -18,7 +18,8 @@ bool GenderRecognizer::isSVMLoaded = false;
 
 GenderRecognizer::GenderRecognizer()
     : _className(FUNC_NAME) {
-  m_recognizerName = TO_STR(Gender);
+  m_featureType = FFR::Gender;
+  m_featureName = enum2str(m_featureType);
   m_result = GENDEDR_RESULT_MALE;
 }
 

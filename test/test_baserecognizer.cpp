@@ -226,7 +226,7 @@ bool test_BaseRecognizer::test_readImageInLoop(void) {
       cv::Mat img;  // = cv::imread("lena.jpg");
       m_pBaseRecognizer->readImageFromFile(in_fileName, img);
 
-#if 0 // dont write the out image
+#if 1 // dont write the out image
       std::string out_fileName = ts->get_data_path() + OUTPUT_FOLDER + DIR_SEP;
       out_fileName += file;
       cv::imwrite(out_fileName, img);

@@ -26,7 +26,8 @@ FeaturesRecognizer::FeaturesRecognizer()
   m_SVMParams.gamma = 5.383;
 
   // setting default values
-  m_recognizerName = "[None]";
+  m_featureType = FFR::Feature_Undefined;
+  m_featureName = "[None]";
 }
 
 FeaturesRecognizer::~FeaturesRecognizer() {
@@ -39,7 +40,7 @@ bool FeaturesRecognizer::loadSVM(const FFR::String& /*fn*/) {
   do {  // for common error handling
 
     cv::String fn("");  //= cwd;
-    fn += cv::format("cv2_svm_%s_model.yml", m_recognizerName.c_str());
+    fn += cv::format("cv2_svm_%s_model.yml", m_featureName.c_str());
     // below code taken from letter_recog.cpp opencv 2.4 sample
     // and `sv_count` condition from OpenCV Q&A forum
     m_SVMobj.load(fn.c_str());

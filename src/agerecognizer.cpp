@@ -18,7 +18,8 @@ bool AgeRecognizer::isSVMLoaded = false;
 
 AgeRecognizer::AgeRecognizer()
     : _className(FUNC_NAME) {
-  m_recognizerName = TO_STR(Age);
+  m_featureType = FFR::Age;
+  m_featureName = enum2str(m_featureType);
   m_result = AGE_RESULT_ADULT;
 }
 
