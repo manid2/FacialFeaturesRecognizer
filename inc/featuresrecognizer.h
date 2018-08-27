@@ -22,7 +22,11 @@
 namespace FFR {
 
 /**
- * Abstract base class to get the features result.
+ * Abstract base class to get the recognition results.
+ *
+ * To add a new feature to recognize on the face create a new class as a
+ * derived class of this abstract class and override getResult() pure virtual
+ * method to get the recognition.
  */
 class FeaturesRecognizer {
  public:
@@ -47,10 +51,17 @@ class FeaturesRecognizer {
   CvSVMParams m_SVMParams;  // doesnt have cv namespace
 
  public:
+  /**
+   * The derived concrete classes implementing the specific feature
+   * recognition must override this method to give recognition results
+   * to the base recognizer which interacts with the UI.
+   */
   virtual FFR::String getResult(/*const*/std::vector<float>& hog_fv)=0;
-  virtual bool loadSVM(const FFR::String& filename = "");
+  // loads SVM model
+  bool loadSVM(const FFR::String& filename = "");
 };
 
+//! Gives the feature recognizer object, simpler than using factory pattern.
 extern FeaturesRecognizer* getRecognizer(FFR::Feature);
 
 } /* namespace FFR */

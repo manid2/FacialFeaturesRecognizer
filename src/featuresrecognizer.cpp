@@ -36,9 +36,7 @@ FeaturesRecognizer::~FeaturesRecognizer() {
 
 bool FeaturesRecognizer::loadSVM(const FFR::String& /*fn*/) {
   bool success = true;
-
   do {  // for common error handling
-
     cv::String fn("");  //= cwd;
     fn += cv::format("cv2_svm_%s_model.yml", m_featureName.c_str());
     // below code taken from letter_recog.cpp opencv 2.4 sample

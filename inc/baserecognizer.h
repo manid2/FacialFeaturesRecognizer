@@ -30,11 +30,11 @@ namespace FFR {
 typedef std::set<FFR::Feature> FeaturesSet;
 //typedef std::set<FFR::String> ResultsSet;
 
-// to avoid feature-result mismatch issue, we use a pair
+//! to avoid feature-result mismatch issue, we use a pair
 typedef std::pair<FFR::Feature, FFR::String> ResultPair;
-// set of feature-result per face
+//! set of feature-result per face
 typedef std::set<ResultPair> ResultsPairSet;
-// results per image, equals no of faces in the image
+//! results per image, equals no of faces in the image
 typedef std::vector<ResultsPairSet> ResultsVec;
 
 /**
@@ -61,11 +61,12 @@ class BaseRecognizer {
   }
 
  public:
+  //! processes video from file
   ErrorCode readVideoFromFile(const std::string& vidFileName = "test.m4v");
+  //! processes video from cam with id
   ErrorCode readVideoFromCam(const int id = 0);
-  ErrorCode detectFace(cv::Mat& frame, std::vector<cv::Rect>& faces,
-                       cv::Mat& frame_gray);
-  // for future use and useful in testing
+
+  // for unit testing and future use
   ErrorCode readImageFromFile(const FFR::String& fileName, cv::Mat& img_o);
   ErrorCode init(void);
   ErrorCode loadClassifier(const FFR::String& fileName);
@@ -89,6 +90,8 @@ class BaseRecognizer {
   cv::CascadeClassifier m_faceCascade;
   ErrorCode readImage(cv::Mat& img);
   ErrorCode readVideo(cv::VideoCapture& cap);
+  ErrorCode detectFace(cv::Mat& frame, std::vector<cv::Rect>& faces,
+                       cv::Mat& frame_gray);
   ErrorCode recognizeFeatures(const FeaturesSet& features, ResultsVec& results,
                               cv::Mat& frame_gray,
                               std::vector<cv::Rect>& faces);

@@ -17,6 +17,9 @@
 
 namespace FFR {
 
+/**
+ * Recognizes Age in the face
+ */
 class AgeRecognizer : public FeaturesRecognizer {
  public:
   const FFR::String _className;

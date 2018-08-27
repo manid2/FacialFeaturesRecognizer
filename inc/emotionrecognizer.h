@@ -17,6 +17,9 @@
 
 namespace FFR {
 
+/**
+ * Recognizes Emotion in the face
+ */
 class EmotionRecognizer : public FeaturesRecognizer {
  public:
   const FFR::String _className;

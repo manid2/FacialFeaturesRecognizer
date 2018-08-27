@@ -17,6 +17,9 @@
 
 namespace FFR {
 
+/**
+ * Recognizes Gender in the face
+ */
 class GenderRecognizer : public FeaturesRecognizer {
  public:
   const FFR::String _className;

@@ -19,12 +19,12 @@ namespace FFR {
 
 BaseRecognizer::BaseRecognizer()
     : _className(FUNC_NAME) {
-  /// should recognize all features by default
+  // should recognize all features by default
   m_features.insert(FFR::Age);
   m_features.insert(FFR::Emotion);
   m_features.insert(FFR::Gender);
 
-  /// putText params
+  // putText params
   m_fontFace = cv::FONT_HERSHEY_SIMPLEX;
   m_fontScale = 0.75f;
   m_fontColor = Scalar(240, 40, 240);
@@ -46,7 +46,6 @@ void BaseRecognizer::printLog() {
 
 ErrorCode BaseRecognizer::readVideoFromFile(const std::string& vidFileName) {
   ErrorCode err = FFR::OK;
-
   do {  // for common error handling
     VideoCapture cap(vidFileName);
     // Check if camera opened successfully
@@ -66,7 +65,6 @@ ErrorCode BaseRecognizer::readVideoFromFile(const std::string& vidFileName) {
 
 ErrorCode BaseRecognizer::readVideoFromCam(const int id) {
   ErrorCode err = FFR::OK;
-
   do {  // for common error handling
     VideoCapture cap(id);
     // Check if camera opened successfully
@@ -86,9 +84,8 @@ ErrorCode BaseRecognizer::readVideoFromCam(const int id) {
 
 ErrorCode BaseRecognizer::readVideo(cv::VideoCapture& cap) {
   ErrorCode err = FFR::OK;
-
   do {  // for common error handling
-    /// one-time (expensive calls) initialization functions,
+    // one-time (expensive calls) initialization functions,
     // i.e. loading models, classifiers
     this->init();
 
@@ -101,13 +98,13 @@ ErrorCode BaseRecognizer::readVideo(cv::VideoCapture& cap) {
         break;
       }
 
-      /// read the frame as image
+      // read the frame as image
       this->readImage(frame);
 
-      /// Display the resulting frame
+      // Display the resulting frame
       imshow("video", frame);
 
-      /// Press  ESC or 'q' on keyboard to exit
+      // Press  ESC or 'q' on keyboard to exit
       char c = (char) waitKey(10);
       if (c == 27 || c == 'q') {
         err = FFR::OK;
@@ -116,7 +113,7 @@ ErrorCode BaseRecognizer::readVideo(cv::VideoCapture& cap) {
       }
     }  // while(1)
 
-    /// TODO: YTI, finish(), to clean up resources and also to make it
+    // TODO: YTI, finish(), to clean up resources and also to make it
     // available outside the class, i.e. for unit testing.
   } while (0);
   return err;
@@ -134,7 +131,7 @@ ErrorCode BaseRecognizer::init() {
 ErrorCode BaseRecognizer::loadClassifier(const FFR::String& /*fileName*/) {
   ErrorCode err = FFR::OK;
   do {  // for common error handling
-    /// Load cascade classifier
+    // Load cascade classifier
     m_faceCascade.load("haarcascade_frontalface_default.xml");
     if (m_faceCascade.empty()) {
       err = FFR::ImageReadError;
@@ -148,7 +145,7 @@ ErrorCode BaseRecognizer::loadClassifier(const FFR::String& /*fileName*/) {
 ErrorCode BaseRecognizer::initRecognizers(void) {
   ErrorCode err = FFR::OK;
   do {  // for common error handling
-    /// get recognizers for each feature
+    // get recognizers for each feature
     FeaturesSet::iterator itr_f = m_features.begin();
     for (; itr_f != m_features.end(); itr_f++) {
       FeaturesRecognizer* fr = FFR::getRecognizer(*itr_f);
@@ -178,16 +175,16 @@ ErrorCode BaseRecognizer::readImageFromFile(const FFR::String& fileName,
 ErrorCode BaseRecognizer::readImage(cv::Mat& img) {
   ErrorCode err = FFR::OK;
   do {
-    /// Detect faces in the image
+    // Detect faces in the image
     cv::Mat frame_gray;
     std::vector<Rect> faces;
     err = this->detectFace(img, faces, frame_gray);
 
-    /// Recognize facial features
+    // Recognize facial features
     m_resultsVec = ResultsVec(faces.size());
     this->recognizeFeatures(m_features, m_resultsVec, frame_gray, faces);
 
-    /// Draw the results on the original image
+    // Draw the results on the original image
     this->drawResults(img, faces, m_features, m_resultsVec);
   } while (0);
   return err;
@@ -196,13 +193,12 @@ ErrorCode BaseRecognizer::readImage(cv::Mat& img) {
 ErrorCode BaseRecognizer::detectFace(cv::Mat& frame, std::vector<Rect>& faces,
                                      cv::Mat& frame_gray) {
   ErrorCode err = FFR::OK;
-
   do {  // for common error handling
-    /// Pre-process input frame for face detection
+    // Pre-process input frame for face detection
     cvtColor(frame, frame_gray, CV_BGR2GRAY);
     equalizeHist(frame_gray, frame_gray);
 
-    /// Detect faces
+    // Detect faces
     m_faceCascade.detectMultiScale(frame_gray, faces, 1.1, 3,
                                    0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
 
@@ -215,23 +211,20 @@ ErrorCode BaseRecognizer::recognizeFeatures(const FeaturesSet& features,
                                             cv::Mat& frame_gray,
                                             std::vector<cv::Rect>& faces) {
   ErrorCode err = FFR::OK;
-
   do {  // for common error handling
-    /// pre-process faces to get HOG fv
-
     cv::Mat face_mat;  // dont modify frame_gray
     for (size_t fa = 0; fa < faces.size(); fa++) {
-      /// 1. crop the face from the frame
+      // 1. crop the face from the frame
       face_mat = frame_gray(faces.at(fa));
 
-      /// 2. resize to 50,50
+      // 2. resize to 50,50
       cv::resize(face_mat, face_mat, cv::Size(50, 50));
 
-      /// 3. get HOG fv
+      // 3. get HOG fv
       std::vector<float> hog_fv;
       this->computeHOG(face_mat, hog_fv);
 
-      /// 4. make predictions for each feature
+      // 4. make predictions for each feature
       std::vector<FFR::FeaturesRecognizer*>::iterator itr_ffr =
           m_ffrVec.begin();
       for (; itr_ffr != m_ffrVec.end(); itr_ffr++) {
@@ -247,13 +240,11 @@ ErrorCode BaseRecognizer::recognizeFeatures(const FeaturesSet& features,
 ErrorCode BaseRecognizer::computeHOG(const cv::Mat& img,
                                      std::vector<float>& hog_features) {
   ErrorCode err = FFR::OK;
-
   do {  // for common error handling
     // NOTE: Confirmed this is the same hog function as calculated in the python
     // script used in training the SVM model.
     m_HOGDescriptor.compute(img, hog_features);
   } while (0);
-
   return err;
 }
 
@@ -262,18 +253,16 @@ ErrorCode BaseRecognizer::drawResults(cv::Mat& frame,
                                       const FeaturesSet& features,
                                       const ResultsVec& results) {
   ErrorCode err = FFR::OK;
-
   do {  // for common error handling
-
     for (size_t fa = 0; fa < faces.size(); fa++) {
-      /// 1. Draw ellipses around the faces
+      // 1. Draw ellipses around the faces
       const Rect& face_rect = faces.at(fa);
       Point center(face_rect.x + face_rect.width * 0.5,
                    face_rect.y + face_rect.height * 0.5);
       ellipse(frame, center,
               Size(face_rect.width * 0.5, face_rect.height * 0.5), 0, 0, 360,
               Scalar(255, 0, 0), 4, 8, 0);
-      /// 2. Draw features results text near the faces
+      // 2. Draw features results text near the faces
       int li = 0;
       // for each face in the results vector iterate through the results pair set
       for (auto res_pair : results.at(fa)) {
@@ -282,7 +271,7 @@ ErrorCode BaseRecognizer::drawResults(cv::Mat& frame,
         const FFR::String& res = res_pair.second;
 
         // put text on the frame
-        putText(frame, format("%s: %s", enum2str(f).c_str(), res.c_str()),
+        putText(frame, format("%-10s: %s", enum2str(f).c_str(), res.c_str()),
                 Point(face_rect.x, face_rect.y + li), m_fontFace, m_fontScale,
                 m_fontColor, 2);
         li += 22;
@@ -292,10 +281,14 @@ ErrorCode BaseRecognizer::drawResults(cv::Mat& frame,
   return err;
 }
 
+/**
+ * Entry point into the application
+ */
 int execute(int argc, char **argv) {
   ErrorCode err = FFR::OK;
+
+  // Detect facial features in the default video stream
   BaseRecognizer br;
-  /// Detect facial features in the video stream
   err = br.readVideoFromFile();
 
   return static_cast<int>(err);
