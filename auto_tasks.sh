@@ -13,7 +13,7 @@ create_folders()
 
 TargetFolder=$1
 echo ${TargetFolder}
-SubFolders=("inc" "src" "obj" "data" "doc" "test"  "util")
+SubFolders=("inc" "src" "data" "doc" "test" "util")
 
 for Folder in *${TargetFolder}/ ; do
    Folder=${Folder%/}
