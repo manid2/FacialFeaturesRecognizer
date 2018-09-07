@@ -41,6 +41,19 @@ typedef std::vector<ResultsPairSet> ResultsVec;
  * Class to interact with the FeaturesRecognizer and with the UI.
  * It handles the pre-processing of the input image for feature vector
  * generation and displaying the result on the UI
+ *
+ * MSC for Facial Features Recognizer
+ *
+ *\msc
+ *    hscale = "2";
+ *
+ *    a[label="Main"],b[label="BaseRecognizer"],c[label="FeaturesRecognizer"];
+ *
+ *    a=>b [ label = "Read Image" ] ;
+ *    b=>c [ label = "HOG Features"];
+ *    b<<c [ label = "Results"];
+ *    a<<b [ label = "Result Image"];
+ *\endmsc
  */
 class BaseRecognizer {
  public:

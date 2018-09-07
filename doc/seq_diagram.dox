@@ -1,0 +1,14 @@
+/**
+ * MSC for Facial Features Recognizer
+ *
+ *\msc
+ *    hscale = "2";
+ *   
+ *    a[label="Main"],b[label="BaseRecognizer"],c[label="FeaturesRecognizer"];
+ *   
+ *    a=>b [ label = "Read Image" ] ;
+ *    b=>c [ label = "HOG Features"];
+ *    b<<c [ label = "Results"];
+ *    a<<b [ label = "Result Image"];
+ *\endmsc
+ */
