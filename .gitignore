@@ -86,3 +86,4 @@ Thumbs.db
 *.dll
 *.exe
 
+.vscode/c_cpp_properties.json

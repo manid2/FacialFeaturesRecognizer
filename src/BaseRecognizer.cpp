@@ -266,7 +266,7 @@ ErrorCode BaseRecognizer::convertToML(const cv::Mat& hogMat, cv::Mat& mlMat) {
       CV_Assert(hogMat.cols == 1 || hogMat.rows == 1);
       if (hogMat.cols == 1) {
         cv::transpose(hogMat, tmp);
-        tmp.copyTo(hogMat.row((int) 0));
+        tmp.copyTo(mlMat.row((int) 0));
       } else if (hogMat.rows == 1) {
         hogMat.copyTo(mlMat.row((int) 0));
       }
@@ -277,7 +277,7 @@ ErrorCode BaseRecognizer::convertToML(const cv::Mat& hogMat, cv::Mat& mlMat) {
       err = FFR::MlError;
       DEBUGLE("\t*** An unknown exception occurred ***\n");
     }
-    DEBUGLD("\t\t\ttrainData.cols=[%d]\n", mlMat.cols);
+    DEBUGLD("\t\t\tmlMat.cols=[%d]\n", mlMat.cols);
   } while (0);
   return err;
 }
