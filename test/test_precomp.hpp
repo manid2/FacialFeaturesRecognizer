@@ -19,7 +19,7 @@
 #include <fstream>
 
 // OpenCV testing system headers
-#include "opencv2/ts/ts.hpp"
+#include "opencv2/ts.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
 // utility headers

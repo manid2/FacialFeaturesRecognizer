@@ -15,8 +15,8 @@
  * Emotions.
  \***************************************************************************/
 
+#include <BaseRecognizer.h>
 #include <iostream>
-#include <baserecognizer.h>
 
 using namespace std;
 using namespace FFR;

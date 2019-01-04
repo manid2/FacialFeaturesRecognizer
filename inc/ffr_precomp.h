@@ -13,6 +13,8 @@
 #ifndef FFR_INC_FFR_PRECOMP_H_
 #define FFR_INC_FFR_PRECOMP_H_
 
+#define FFR_DATA_PATH "FFR_DATA_PATH"
+
 #include <string>
 
 namespace FFR {
@@ -27,7 +29,8 @@ enum ErrorCode {
   FileWriteError,
   ImageReadError,
   ImageWriteError,
-  FaceDetectError
+  FaceDetectError,
+  MlError
 };
 
 //! Feature types

@@ -15,7 +15,7 @@
 #=============================================================================
 # Setup the project's executable, headers, sources and dependencies
 #=============================================================================
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 set (CMAKE_CXX_STANDARD 11)
 
 project(FacialFeaturesRecognizer)
@@ -29,10 +29,11 @@ set(SRCS main.cpp ${module_srcs})
 # debug macros
 #add_definitions(-DDUMMY_DATA)
 
-string(TOLOWER ${MODULE_NAME} MODULE_NAME)
+#string(TOLOWER ${MODULE_NAME} MODULE_NAME)
 find_package( OpenCV REQUIRED )
-add_executable(${MODULE_NAME} ${SRCS})
-target_link_libraries(${MODULE_NAME}  ${OpenCV_LIBS})
+set(EXE_NAME exe_${MODULE_NAME})
+add_executable(${EXE_NAME} ${SRCS})
+target_link_libraries(${EXE_NAME}  ${OpenCV_LIBS})
 
 #-- target for text exe
 # includes gtest or opencv ts module for testing
