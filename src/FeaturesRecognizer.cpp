@@ -21,11 +21,12 @@ namespace FFR {
 
 FeaturesRecognizer::FeaturesRecognizer()
     : _className(FUNC_NAME) {
+  /* NOTE: SVM is created from the model file
   m_pSVM = SVM::create();
   m_pSVM->setKernel(SVM::LINEAR);
   m_pSVM->setType(SVM::C_SVC);  // n-class classification
   m_pSVM->setC(2.67);
-  m_pSVM->setGamma(5.383);
+  m_pSVM->setGamma(5.383);*/
 
   // setting default values
   m_featureType = FFR::Feature_Undefined;
@@ -43,7 +44,10 @@ bool FeaturesRecognizer::loadSVM(const FFR::String& /*fn*/) {
     fn += cv::format("%s/models/cv4_svm_%s_model.yml",
                      getenv(FFR_DATA_PATH),
                      m_featureName.c_str());
-    m_pSVM->load(fn);
+    //m_pSVM->load(fn);
+    /* a bug is observed in opencv 4.0 svm.load()
+       hence using the method used in opencv 4.0 test code. */
+    m_pSVM = cv::Algorithm::load<SVM>(fn);
     int var_count = m_pSVM->getVarCount();
     if (!var_count /*|| !sv_count*/) {
       DEBUGLE("Could not read the classifier [%s], " "var_count=[%d]\n",
@@ -58,12 +62,6 @@ bool FeaturesRecognizer::loadSVM(const FFR::String& /*fn*/) {
 }
 
 FeaturesRecognizer* getRecognizer(FFR::Feature f) {
-#ifdef WITH_CLASS_NAME
-  const FFR::String _className(FUNC_NAME);
-#else
-  const FFR::String _className("-");
-#endif
-
   FeaturesRecognizer* fr = NULL;
   switch (f) {
     case FFR::Age:
@@ -77,7 +75,6 @@ FeaturesRecognizer* getRecognizer(FFR::Feature f) {
       break;
     default:
       fr = NULL;
-      DEBUGLE("");
       break;
   }
   return fr;

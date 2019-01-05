@@ -277,7 +277,7 @@ ErrorCode BaseRecognizer::convertToML(const cv::Mat& hogMat, cv::Mat& mlMat) {
       err = FFR::MlError;
       DEBUGLE("\t*** An unknown exception occurred ***\n");
     }
-    DEBUGLD("\t\t\tmlMat.cols=[%d]\n", mlMat.cols);
+    //DEBUGLD("\t\t\tmlMat.cols=[%d], mlMat.type()=[%d]\n", mlMat.cols, mlMat.type());
   } while (0);
   return err;
 }

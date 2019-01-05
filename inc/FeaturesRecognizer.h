@@ -46,7 +46,15 @@ class FeaturesRecognizer {
   FFR::String m_featureName;
   FFR::String m_result;
 
-  cv::Ptr<cv::ml::SVM> m_pSVM;
+  //cv::Ptr<cv::ml::SVM> m_pSVM;
+  /* Using the base class for all ML algorithms in OpenCV 4.0.
+     REASON: 
+     * A bug was observed in svm.load() when using the specific class
+     SVM is used.
+     * The specific class save-load tests are not present in 
+     `opencv_test_ml` code.
+    */
+  cv::Ptr<cv::ml::StatModel> m_pSVM;
 
  public:
   /**

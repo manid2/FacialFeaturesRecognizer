@@ -51,7 +51,7 @@ FFR::String EmotionRecognizer::getResult(const cv::Mat& ml_pred_data) {
       break;
     default:
       m_result = EMOTION_RESULT_NEUTRAL;
-      DEBUGLW("default case, svm_res=[%d]\n", svm_res);
+      //DEBUGLW("default case, svm_res=[%d]\n", svm_res);
       break;
   }
   return m_result;

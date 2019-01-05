@@ -45,7 +45,7 @@ FFR::String AgeRecognizer::getResult(const cv::Mat& ml_pred_data) {
       break;
     default:
       m_result = AGE_RESULT_ADULT;
-      DEBUGLW("default case, svm_res=[%d]\n", svm_res);
+      //DEBUGLW("default case, svm_res=[%d]\n", svm_res);
       break;
   }
   return m_result;

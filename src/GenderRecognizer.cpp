@@ -39,7 +39,7 @@ FFR::String GenderRecognizer::getResult(const cv::Mat& ml_pred_data) {
       break;
     default:
       m_result = GENDEDR_RESULT_MALE;
-      DEBUGLW("default case, svm_res=[%d]\n", svm_res);
+      //DEBUGLW("default case, svm_res=[%d]\n", svm_res);
       break;
   }
   return m_result;
