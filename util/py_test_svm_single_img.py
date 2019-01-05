@@ -91,22 +91,22 @@ hog = cv2.HOGDescriptor() # TODO: test with the built in function
 feature_type = "Emotion" # TODO: make it a list to test every feature for a single image
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
-print "-> Loading opencv SVM"
+print("-> Loading opencv SVM")
 svm_model_name = ".{0}models{1}cv2_svm_{2}_model.yml".format(dirsep,
                                                              dirsep,
                                                              feature_type)
 svm.load(svm_model_name) # TODO: setup  svm model filename
-print "-> Loaded opencv SVM=[{}]".format(svm_model_name)
+print("-> Loaded opencv SVM=[{}]".format(svm_model_name))
 
 
 for runCount in range(0, maxRuns):
     # Get a sample for prediction
-    fileName = raw_input("Enter file name: ")
+    fileName = input("Enter file name: ")
     if fileName == "quit" or fileName == "q":
-        print "Quitting the application!"
+        print("Quitting the application!")
         break
     else:
-        print "File name is: {}".format(fileName)
+        print("File name is: {}".format(fileName))
     # Get landmark features from the image.
     img_gray = cv2.imread(fileName, cv2.CV_LOAD_IMAGE_GRAYSCALE)
     img_histeq = cv2.equalizeHist(img_gray)
@@ -118,4 +118,4 @@ for runCount in range(0, maxRuns):
         hog_fv = get_hog_features(c_face_resize)
         #print "hog_fv.shape: ", hog_fv.shape
         result = svm.predict(hog_fv)
-        print "result={}-{}".format(result, ffr_util.FeatureType[feature_type][int(result)])
+        print("result={}-{}".format(result, ffr_util.FeatureType[feature_type][int(result)]))

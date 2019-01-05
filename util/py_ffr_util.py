@@ -127,7 +127,8 @@ def get_dataset(ft, fv):
                             and prediction
     """
     #print "\t\t\t\t-> get_datasets({0}, {1}) - enter".format(ft, fv)
-    folderName = ".{0}FFR_dataset{1}{2}{3}{4}{5}*".format(dirsep,
+    folderName = "{0}{1}FFR_dataset{2}{3}{4}{5}{6}".format(os.getenv("FFR_DATASET_PATH"),
+                                                          dirsep,
                                                           dirsep,
                                                           ft,
                                                           dirsep,
@@ -141,5 +142,9 @@ def get_dataset(ft, fv):
     prediction_data = p_faces[-int(len(p_faces) * 0.2):]
     training_labels = [FeatureType[ft].index(fv)] * len(training_data)
     prediction_labels = [FeatureType[ft].index(fv)] * len(prediction_data)
+    # convert to int array for cv4
+    training_labels = np.array(training_labels, dtype=int)
+    prediction_labels = np.array(prediction_labels, dtype=int)
+    
     #print "\n get_datasets({0}, {1}) - exit".format(ft, fv)
     return training_data, training_labels, prediction_data, prediction_labels
