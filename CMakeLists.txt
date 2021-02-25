@@ -75,6 +75,9 @@ else (DOXYGEN_FOUND)
   message("Doxygen need to be installed to generate the doxygen documentation")
 endif (DOXYGEN_FOUND)
 
+#-- add utils
+add_subdirectory(util)
+
 # Use the below cmake command to generate the cmake eclipse project
 # cmake -G"Eclipse CDT4 - Unix Makefiles"\
 #       -DCMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT=TRUE\
